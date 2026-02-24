@@ -1,2 +1,3 @@
 # simple-vcs
-Simplified application for version control
+# Simplified application for version control
+It's going to be written soon...
