@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SimpleVcsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SimpleVcsApplication.class, args);
+
+        SpringApplication.run(SimpleVcsApplication.class, args);
 	}
 
 }
