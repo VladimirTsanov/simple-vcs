@@ -29,6 +29,6 @@ public class Document {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy= "document", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy= "document", cascade = CascadeType.ALL)
     private List<Version> versions;
 }
