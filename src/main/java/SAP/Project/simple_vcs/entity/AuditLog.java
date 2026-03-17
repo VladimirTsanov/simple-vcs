@@ -30,5 +30,5 @@ public class AuditLog {
     private String details;
 
     @Column(name = "created_at")
-    private LocalDateTime cretedAt;
+    private LocalDateTime createdAt;
 }

@@ -19,7 +19,7 @@ public class Version {
     @JoinColumn(name = "document_id")
     private Document document;
 
-    @Column(name = "version_number",  nullable = false,  unique = true)
+    @Column(name = "version_number",  nullable = false)
     private Integer versionNumber;
 
     @Column(columnDefinition = "TEXT")
