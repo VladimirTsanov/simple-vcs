@@ -1,5 +1,6 @@
 package SAP.Project.simple_vcs.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -44,9 +45,15 @@ public class SecurityConfig {
                 )
                 .formLogin(Customizer.withDefaults()) // Задача: Login функционалност
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // Това е адресът за изход
-                        .logoutSuccessUrl("/login?logout") // Къде отиваме след успех
+                        .logoutUrl("/logout")
+                        // Заменяме .logoutSuccessUrl с .logoutSuccessHandler
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.getWriter().write("{\"message\": \"Излязохте успешно от системата!\"}");
+                        })
                         .invalidateHttpSession(true)
+                        .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
