@@ -23,17 +23,11 @@ public class DocumentService {
     public Document createDocument(DocumentRequest request) {
         User author = userRepository.findById(request.authorId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Document document = new Document();
-        document.setTitle(request.title());
+        Document document = Document.builder().title(request.title()).build();
         document = documentRepository.save(document);
-        Version v1 = new Version();
-        v1.setDocument(document);
-        v1.setContent(request.content());
-        v1.setVersionNumber(1);
-        v1.setStatus(VersionStatus.DRAFT);
-        v1.setAuthor(author);
-        versionRepository.save(v1);
+        Version v1 = Version.builder().document(document).versionNumber(1).status(VersionStatus.DRAFT).author(author).content(request.content()).build();
         document.setActiveVersion(v1);
+        document.getVersions().add(v1);
         return documentRepository.save(document);
     }
     public List<Document> getAllDocuments() {
