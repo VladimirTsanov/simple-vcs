@@ -15,15 +15,13 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(User user) {
         this.user = user;
     }
-    @Override
 
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        System.out.println("Checking roles for user: " + user.getUsername());
 
         Collection<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> {
                     String roleName = "ROLE_" + role.getName();
-                    System.out.println("Mapping role: " + roleName); // Виж какво излиза тук!
                     return new SimpleGrantedAuthority(roleName);
                 })
                 .collect(Collectors.toList());
