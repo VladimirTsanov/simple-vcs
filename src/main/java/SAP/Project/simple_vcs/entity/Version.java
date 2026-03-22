@@ -1,9 +1,7 @@
 package SAP.Project.simple_vcs.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +15,7 @@ public class Version {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "document_id")
     private Document document;
 
@@ -30,11 +28,11 @@ public class Version {
     @Enumerated(EnumType.STRING)
     private VersionStatus status;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "author_id")
     private User author;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "reviewer_id")
     private User reviewer;
 
