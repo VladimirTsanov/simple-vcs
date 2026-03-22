@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "versions")
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 public class Version {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +21,7 @@ public class Version {
     @JoinColumn(name = "document_id")
     private Document document;
 
-    @Column(name = "version_number",  nullable = false,  unique = true)
+    @Column(name = "version_number", nullable = false, unique = true)
     private Integer versionNumber;
 
     @Column(columnDefinition = "TEXT")
@@ -34,13 +36,13 @@ public class Version {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "reviewer_id")
-    private User reviewerId;
+    private User reviewer;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 }
