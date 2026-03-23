@@ -1,8 +1,8 @@
-package SAP.Project.simple_vcs.controller;
+package SAP.Project.simple_vcs.controllers;
 
 import SAP.Project.simple_vcs.entity.User;
 import SAP.Project.simple_vcs.payload.RegistrationRequest;
-import SAP.Project.simple_vcs.service.UserService;
+import SAP.Project.simple_vcs.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

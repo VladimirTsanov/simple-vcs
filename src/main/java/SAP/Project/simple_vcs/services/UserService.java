@@ -1,4 +1,4 @@
-package SAP.Project.simple_vcs.service;
+package SAP.Project.simple_vcs.services;
 
 import SAP.Project.simple_vcs.entity.Role;
 import SAP.Project.simple_vcs.entity.User;
@@ -7,7 +7,6 @@ import SAP.Project.simple_vcs.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
