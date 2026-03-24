@@ -45,8 +45,6 @@ public class DataInitializer implements CommandLineRunner {
             admin.setRoles(Set.of(adminRole));
             admin.setActive(true);
             userRepository.save(admin);
-
-
         }
 
         if (userRepository.findByUsername("user1").isEmpty()) {

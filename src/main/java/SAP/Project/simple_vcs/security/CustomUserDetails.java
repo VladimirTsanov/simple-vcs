@@ -2,6 +2,7 @@ package SAP.Project.simple_vcs.security;
 
 import SAP.Project.simple_vcs.entity.Role;
 import SAP.Project.simple_vcs.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
     private final User user;
 
@@ -19,14 +21,12 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        Collection<SimpleGrantedAuthority> authorities = user.getRoles().stream()
+        return user.getRoles().stream()
                 .map(role -> {
                     String roleName = "ROLE_" + role.getName();
                     return new SimpleGrantedAuthority(roleName);
                 })
                 .collect(Collectors.toList());
-
-        return authorities;
     }
     @Override
     public String getPassword() {
@@ -58,9 +58,6 @@ public class CustomUserDetails implements UserDetails {
         return user.isActive();
     }
 
-    public User getUser() {
-        return user;
-    }
 }
 
 
