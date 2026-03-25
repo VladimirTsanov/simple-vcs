@@ -1,38 +1,30 @@
 package SAP.Project.simple_vcs.controllers;
 
-import SAP.Project.simple_vcs.entity.User;
-import SAP.Project.simple_vcs.payload.RegistrationRequest;
+import SAP.Project.simple_vcs.dto.UserRegistrationDto;
 import SAP.Project.simple_vcs.services.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
-@RequestMapping("/api/public")
-public class AuthController{
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
     private final UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
+        // No try-catch needed!
+        // If this fails, the GlobalExceptionHandler catches it automatically.
+        userService.registerUser(registrationDto);
 
-    @PostMapping(value = "/register", consumes = {
-            org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-            org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-    })
-    public ResponseEntity<?> registerUser(@RequestBody RegistrationRequest request) {
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPasswordHash(request.getPassword());
-        user.setEmail(request.getEmail());
-
-        userService.registerUser(user);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .location(java.net.URI.create("/login.html?registered=true"))
+                .location(URI.create("/login.html?registered=true"))
                 .build();
     }
 }

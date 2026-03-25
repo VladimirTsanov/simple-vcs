@@ -2,10 +2,9 @@ package SAP.Project.simple_vcs.config;
 
 import SAP.Project.simple_vcs.security.CustomAccessDeniedHandler;
 import SAP.Project.simple_vcs.security.CustomAuthenticationEntryPoint;
-import org.springframework.boot.autoconfigure.security.StaticResourceLocation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,27 +13,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    public SecurityConfig(CustomAuthenticationEntryPoint authenticationEntryPoint,
-                          CustomAccessDeniedHandler accessDeniedHandler) {
-        this.authenticationEntryPoint = authenticationEntryPoint;
-        this.accessDeniedHandler = accessDeniedHandler;
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/", "/index.html", "/login", "/login.html",
                                 "/register", "/register.html").permitAll()
 
@@ -48,13 +43,19 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            )
-            .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(authenticationEntryPoint)
-                    .accessDeniedHandler(accessDeniedHandler)
-            )
+
+                // 3. Exception Handling (Connects to your custom handlers)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+
+                // 4. Session Management
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+
+                // 5. Form Login (Using the paths from Code 1)
                 .formLogin(form -> form
                         .loginPage("/login.html")
                         .loginProcessingUrl("/api/public/login")
@@ -62,18 +63,19 @@ public class SecurityConfig {
                         .failureUrl("/login.html?error=true")
                         .permitAll()
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-                )
+
+                // 6. Logout (Cleaned up version)
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
+                        .logoutUrl("/api/public/logout")
                         .logoutSuccessUrl("/login.html?logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-            .httpBasic(Customizer.withDefaults());
+
+                // Enable Frames for H2 Console
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         return http.build();
     }
