@@ -20,7 +20,7 @@ public class Version {
     @JoinColumn(name = "document_id")
     private Document document;
 
-    @Column(name = "version_number",  nullable = false)
+    @Column(name = "version_number", nullable = false, unique = true)
     private Integer versionNumber;
 
     @Column(columnDefinition = "TEXT")
@@ -41,7 +41,7 @@ public class Version {
     private LocalDateTime createdAt;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 }
