@@ -4,6 +4,7 @@ import SAP.Project.simple_vcs.dto.UserRegistrationDto;
 import SAP.Project.simple_vcs.dto.UserResponseDto;
 import SAP.Project.simple_vcs.entity.Role;
 import SAP.Project.simple_vcs.entity.User;
+import SAP.Project.simple_vcs.exception.UserAlreadyExistsException;
 import SAP.Project.simple_vcs.repository.RoleRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,10 @@ public class UserService {
 
     public void registerUser(UserRegistrationDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new RuntimeException("Username already taken.");
+            throw new UserAlreadyExistsException("Username " + dto.getUsername() + "already taken.");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email already registered.");
+            throw new UserAlreadyExistsException("The email " + dto.getEmail() + "already registered.");
         }
 
         User user = new User();
@@ -41,10 +42,9 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         user.setActive(true);
 
-        // Default Role Assignment: Using ROLE_USER (standard)
-        // Swap to ROLE_AUTHOR if your project requirements specifically demand it.
-        Role defaultRole = roleRepository.findByName("ROLE_USER")
+        Role defaultRole = roleRepository.findByName("ROLE_AUTHOR")
                 .orElseThrow(() -> new RuntimeException("Default Role not found."));
+
         user.setRoles(new HashSet<>(Collections.singletonList(defaultRole)));
 
         userRepository.save(user);
@@ -91,7 +91,7 @@ public class UserService {
     }
 
     public Role createRole(String name, String description) {
-        if(roleRepository.findByName(name).isPresent()) {
+        if (roleRepository.findByName(name).isPresent()) {
             throw new RuntimeException("Role already exists");
         }
         Role role = new Role();

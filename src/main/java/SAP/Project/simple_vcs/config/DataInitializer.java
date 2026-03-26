@@ -25,15 +25,27 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> {
             Role role = new Role();
-            role.setName("ADMIN");
+            role.setName("ROLE_ADMIN");
             return roleRepository.save(role);
         });
 
-        Role authorRole = roleRepository.findByName("AUTHOR").orElseGet(() -> {
+        Role authorRole = roleRepository.findByName("ROLE_AUTHOR").orElseGet(() -> {
             Role role = new Role();
-            role.setName("AUTHOR");
+            role.setName("ROLE_AUTHOR");
+            return roleRepository.save(role);
+        });
+
+        Role reviewerRole = roleRepository.findByName("ROLE_REVIEWER").orElseGet(() -> {
+            Role role = new Role();
+            role.setName("ROLE_REVIEWER");
+            return roleRepository.save(role);
+        });
+
+        Role readerRole = roleRepository.findByName("ROLE_READER").orElseGet(() -> {
+            Role role = new Role();
+            role.setName("ROLE_READER");
             return roleRepository.save(role);
         });
 

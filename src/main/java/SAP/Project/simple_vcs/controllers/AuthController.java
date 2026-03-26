@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,14 +19,15 @@ public class AuthController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
-        // No try-catch needed!
-        // If this fails, the GlobalExceptionHandler catches it automatically.
+    @PostMapping(value = "/register", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
+
         userService.registerUser(registrationDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .location(URI.create("/login.html?registered=true"))
-                .build();
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Registration Successful");
+        response.put("redirectUrl", "/login.html?registered=true");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

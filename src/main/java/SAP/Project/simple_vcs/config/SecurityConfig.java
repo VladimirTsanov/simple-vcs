@@ -20,68 +20,62 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-    private final CustomAccessDeniedHandler accessDeniedHandler;
+        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+        private final CustomAccessDeniedHandler accessDeniedHandler;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(AbstractHttpConfigurer::disable)
 
-                .authorizeHttpRequests(auth -> auth
+                                .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/", "/index.html", "/login", "/login.html",
-                                "/register", "/register.html").permitAll()
+                                                .requestMatchers("/", "/index.html", "/login", "/login.html",
+                                                                "/register", "/register.html", "/favicon.ico", "/.well-known/**")
+                                                .permitAll()
 
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/app.js").permitAll()
+                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/app.js")
+                                                .permitAll()
 
-                        .requestMatchers("/documents", "/documents.html").permitAll()
+                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**", "/api/public/**").permitAll()
 
-                        .requestMatchers("/admin", "/admin.html", "/api/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin", "/admin.html", "/api/admin/**")
+                                                .hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers("/my-documents", "/my_documents.html", "/api/user/**").hasAnyRole("USER", "ADMIN")
+                                                .requestMatchers("/my-documents", "/my_documents.html", "/api/user/**")
+                                                .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
-                        .anyRequest().authenticated()
-                )
+                                                .anyRequest().authenticated())
 
-                // 3. Exception Handling (Connects to your custom handlers)
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler)
-                )
+                                .exceptionHandling(ex -> ex
+                                                .authenticationEntryPoint(authenticationEntryPoint)
+                                                .accessDeniedHandler(accessDeniedHandler))
 
-                // 4. Session Management
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
-                // 5. Form Login (Using the paths from Code 1)
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .loginProcessingUrl("/api/public/login")
-                        .defaultSuccessUrl("/my-documents", true)
-                        .failureUrl("/login.html?error=true")
-                        .permitAll()
-                )
+                                .formLogin(form -> form
+                                                .loginPage("/login.html")
+                                                .loginProcessingUrl("/api/public/login")
+                                                .defaultSuccessUrl("/my-documents", true)
+                                                .failureUrl("/login.html?error=true")
+                                                .permitAll())
 
-                // 6. Logout (Cleaned up version)
-                .logout(logout -> logout
-                        .logoutUrl("/api/public/logout")
-                        .logoutSuccessUrl("/login.html?logout")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
+                                .logout(logout -> logout
+                                                .logoutUrl("/api/public/logout")
+                                                .logoutSuccessUrl("/login.html?logout")
+                                                .invalidateHttpSession(true)
+                                                .clearAuthentication(true)
+                                                .deleteCookies("JSESSIONID")
+                                                .permitAll())
 
-                // Enable Frames for H2 Console
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }
