@@ -34,15 +34,17 @@ public class SecurityConfig {
                                                                 "/register", "/register.html", "/favicon.ico", "/.well-known/**")
                                                 .permitAll()
 
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/app.js")
+                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/registration.js", "/loadDoc.js")
                                                 .permitAll()
 
-                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**", "/api/public/**").permitAll()
+                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**", "/api/public/**",
+                                                                "/api/documents/all", "/error").permitAll()
 
                                                 .requestMatchers("/admin", "/admin.html", "/api/admin/**")
                                                 .hasAuthority("ROLE_ADMIN")
 
-                                                .requestMatchers("/my-documents", "/my_documents.html", "/api/user/**")
+                                                .requestMatchers("/my-documents", "/my_documents.html", "/api/user/**", "/api/documents/new",
+                                                        "/api/versions/**")
                                                 .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
 
                                                 .anyRequest().authenticated())

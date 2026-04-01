@@ -2,7 +2,11 @@ package SAP.Project.simple_vcs.controllers;
 
 import java.util.List;
 
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+import SAP.Project.simple_vcs.exception.UserNotFoundException;
+import SAP.Project.simple_vcs.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +24,13 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/versions")
 @RequiredArgsConstructor
 public class VersionController {
-    
     private final VersionService versionService;
 
-    @PostMapping
-    public ResponseEntity<VersionResponse> createVersion(@RequestBody VersionRequest request) {
-        Version version = versionService.createNewVersion(request);
+    @PostMapping("/new")
+    public ResponseEntity<VersionResponse> createVersion(@RequestBody VersionRequest request,
+                                                         @AuthenticationPrincipal CustomUserDetails userDetails) throws UserNotFoundException, DocumentNotFoundException {
+        Long authorId = userDetails.getUser().getId();
+        Version version = versionService.createNewVersion(request, authorId);
         VersionResponse response = new VersionResponse(
                 version.getId(),
                 version.getVersionNumber(),
@@ -37,7 +42,7 @@ public class VersionController {
     }
 
     @GetMapping("/document/{documentId}")
-    public ResponseEntity<List<VersionResponse>> getDocumentVersions(@PathVariable Long documentId) {
+    public ResponseEntity<List<VersionResponse>> getDocumentVersions(@PathVariable Long documentId) throws DocumentNotFoundException {
         List<VersionResponse> response = versionService.getVersionsForDocument(documentId).stream()
                 .map(v -> new VersionResponse(
                         v.getId(),

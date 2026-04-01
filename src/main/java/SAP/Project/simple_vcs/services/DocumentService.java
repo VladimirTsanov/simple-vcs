@@ -2,6 +2,7 @@ package SAP.Project.simple_vcs.services;
 
 import SAP.Project.simple_vcs.dto.DocumentRequest;
 import SAP.Project.simple_vcs.entity.*;
+import SAP.Project.simple_vcs.exception.UserNotFoundException;
 import SAP.Project.simple_vcs.repository.*;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
@@ -20,9 +21,9 @@ public class DocumentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Document createDocument(DocumentRequest request) {
-        User author = userRepository.findById(request.authorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Document createDocument(DocumentRequest request, Long authorId) throws UserNotFoundException {
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new UserNotFoundException("User with id" + authorId + " not found"));
         Document document = Document.builder()
                 .title(request.title())
                 .build();
