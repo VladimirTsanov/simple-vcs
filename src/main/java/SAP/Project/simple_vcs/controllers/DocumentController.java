@@ -45,4 +45,20 @@ public class DocumentController {
                 .toList();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping(value = "/my")
+    public ResponseEntity<List<DocumentResponse>> getMyDocuments(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long authorId = userDetails.getUser().getId();
+        List<DocumentResponse> response = documentService.getPersonalDocuments(authorId).stream()
+                .map(doc -> new DocumentResponse(
+                        doc.getId(),
+                        doc.getTitle(),
+                        doc.getActiveVersion().getVersionNumber(),
+                        doc.getActiveVersion().getStatus().name(),
+                        doc.getActiveVersion().getAuthor().getUsername()
+                ))
+                .toList();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

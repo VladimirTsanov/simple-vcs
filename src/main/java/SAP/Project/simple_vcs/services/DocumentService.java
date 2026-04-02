@@ -42,4 +42,8 @@ public class DocumentService {
     public List<Document> getAllDocuments() {
         return documentRepository.findAll();
     }
+    public List<Document> getPersonalDocuments(Long authorId) {
+        return documentRepository.findByActiveVersionAuthorId(authorId);
+    }
+
 }
