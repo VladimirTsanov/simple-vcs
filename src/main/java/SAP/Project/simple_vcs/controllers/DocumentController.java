@@ -19,7 +19,7 @@ import java.util.List;
 public class DocumentController {
     private final DocumentService documentService;
 
-    @PostMapping(value = "/new")
+    @PostMapping(value = "/new", consumes = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DocumentResponse> createDocument(@RequestBody DocumentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails ) throws UserNotFoundException {
         Long authorId = userDetails.getUser().getId();
         Document doc = documentService.createDocument(request, authorId);
@@ -30,6 +30,7 @@ public class DocumentController {
                 doc.getActiveVersion().getStatus().name(),
                 doc.getActiveVersion().getAuthor().getUsername()
         );
+
         return ResponseEntity.ok(response);
     }
     @GetMapping(value = "/all")

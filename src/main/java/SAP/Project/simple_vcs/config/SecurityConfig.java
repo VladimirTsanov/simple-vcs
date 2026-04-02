@@ -39,30 +39,20 @@ public class SecurityConfig {
                                                                 "/loadDoc.js", "/loadMyDocs.js", "/createDoc.js")
                                                 .permitAll()
 
-<<<<<<< Updated upstream
-                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**", "/api/public/**",
-                                                                "/api/documents/all", "/error").permitAll()
-=======
                                                 .requestMatchers("/documents", "/documents.html", "/api/auth/**",
                                                                 "/api/public/**",
                                                                 "/api/documents/all")
                                                 .permitAll()
->>>>>>> Stashed changes
 
                                                 .requestMatchers("/admin", "/admin.html", "/api/admin/**")
                                                 .hasAuthority("ROLE_ADMIN")
 
-<<<<<<< Updated upstream
-                                                .requestMatchers("/my-documents", "/my_documents.html", "/api/user/**", "/api/documents/new",
-                                                        "/api/versions/**")
-                                                .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-=======
                                                 .requestMatchers("/my-documents", "/my_documents.html", "/new-document",
                                                                 "/new_document.html",
                                                                 "/api/user/**", "/api/documents/new",
                                                                 "/api/documents/my", "/api/versions/**")
                                                 .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
->>>>>>> Stashed changes
+
 
                                                 .anyRequest().authenticated())
 
