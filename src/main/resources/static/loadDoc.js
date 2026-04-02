@@ -43,7 +43,7 @@ function displayDocuments(documents) {
         <p>Active version: ${doc.version}</p>
         <p>Status: ${doc.status}</p>
         <p>Created: ${new Date(doc.createdAt).toLocaleDateString()}</p>
-        <a href="/documents/${doc.id}">View</a>
+        <a href="/document_details.html?id=${doc.id}">View</a>
         <hr>
         `
         container.appendChild(docElement);
