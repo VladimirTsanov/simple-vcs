@@ -31,21 +31,28 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
 
                                                 .requestMatchers("/", "/index.html", "/login", "/login.html",
-                                                                "/register", "/register.html", "/favicon.ico", "/.well-known/**")
+                                                                "/register", "/register.html", "/favicon.ico",
+                                                                "/.well-known/**")
                                                 .permitAll()
 
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/registration.js", "/loadDoc.js")
+                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/registration.js",
+                                                                "/loadDoc.js", "/loadMyDocs.js", "/createDoc.js")
                                                 .permitAll()
 
-                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**", "/api/public/**",
-                                                                "/api/documents/all").permitAll()
+                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**",
+                                                                "/api/public/**",
+                                                                "/api/documents/all")
+                                                .permitAll()
 
                                                 .requestMatchers("/admin", "/admin.html", "/api/admin/**")
                                                 .hasAuthority("ROLE_ADMIN")
 
-                                                .requestMatchers("/my-documents", "/my_documents.html", "/new-document", "/new_document.html",
-                                                        "/api/user/**", "/api/documents/new", "/api/versions/**")
+                                                .requestMatchers("/my-documents", "/my_documents.html", "/new-document",
+                                                                "/new_document.html",
+                                                                "/api/user/**", "/api/documents/new",
+                                                                "/api/documents/my", "/api/versions/**")
                                                 .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+
 
                                                 .anyRequest().authenticated())
 
