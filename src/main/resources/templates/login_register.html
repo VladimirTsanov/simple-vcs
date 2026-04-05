@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>ITEAC</title>
+    <link rel="stylesheet" th:href="@{/css/style_index.css}">
+</head>
+<body class="light-theme">
+
+<header class="navbar">
+    <div class="logo">
+        <button id="theme-switcher" class="theme-btn">
+            <div class="light-state-icon">
+                <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default">
+                <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover">
+            </div>
+
+            <div class="dark-state-icon">
+                <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default">
+                <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover">
+            </div>
+        </button>
+
+        <span class="logo_name">ITEAC</span>
+    </div>
+
+    <input type="checkbox" id="menu-toggle" class="menu-toggle">
+    <label for="menu-toggle" class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </label>
+
+    <nav>
+        <ul id="nav-list">
+            <li><a th:href="@{/}" class="nav-btn" onclick="setActive(this)">Home</a></li>
+            <li><a href="#myfooter" class="nav-btn" onclick="setActive(this)">About us</a></li>
+            <li><a th:href="@{/login}" class="nav-btn" onclick="setActive(this)">Login</a></li>
+        </ul>
+    </nav>
+
+</header>
+
+
+
+
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="shared-card">
+
+            <div class="form-content-area">
+
+
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger">Invalid username or
+                        password.</div>
+                </div>
+                <div th:if="${param.success}">
+                    <h1>SUCCESSSFULLLL REGISTRAATION</h1>
+                </div>
+                <div th:if="${param.logout}">
+                    <div class="alert alert-info">You have been logged out.</div>
+                </div>
+
+
+
+
+
+                <form th:action="@{/login}" method="post" id="login-side" class="form-section">
+
+                    <h2>Welcome Back</h2>
+                    <p>Enter your details to manage your workspace.</p>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="user@example.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="••••••••••••" required>
+                    </div>
+                    <button type="submit" class="login-submit">Login to Dashboard</button>
+                    <p class="switch-text">Don't have an account? <span onclick="toggleForms()">Create one here</span></p>
+                </form>
+
+
+
+
+                <form th:action="@{/registration}" method="post" th:object="${user}" id="register-side" class="form-section hidden">
+                    <h2>Join Us</h2>
+                    <p>Create your account to start your journey.</p>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" th:field="*{username}" placeholder="johndoe" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" th:field="*{email}" placeholder="newuser@example.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Create Password</label>
+                        <input type="password" th:field="*{password}" placeholder="••••••••••••" required>
+                    </div>
+                    <button type="submit" class="login-submit">Create Account</button>
+                    <p class="switch-text">Already have an account? <span onclick="toggleForms()">Login here</span></p>
+                </form>
+
+            </div>
+
+            <div class="vertical-divider"></div>
+
+            <div class="empty-space"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<footer class="footer" id="myfooter">
+    <div class="footer-container">
+
+        <div class="footer-top">
+            <div class="footer-brand">
+                <span class="footer-logo">ITEAC</span>
+                <div class="social-icons">
+                    <a href="#">FB</a>
+                    <a href="#">IG</a>
+                    <a href="#">TW</a>
+                    <a href="#">YT</a>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="footer-divider">
+
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>About ITEAC</h3>
+                <ul>
+                    <li><a href="#">About us</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Help & Support</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Community Forum</a></li>
+                    <li><a href="#">API Status</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Developers</h3>
+                <ul>
+                    <li><a href="#">GitHub Repo</a></li>
+                    <li><a href="#">Open Source</a></li>
+                    <li><a href="#">Release Notes</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="footer-divider">
+
+        <div class="footer-bottom">
+            <div class="footer-copyright">
+                © 2008-2026 ITEAC. All rights reserved. | <a href="#">Sitemap</a>
+            </div>
+            <div class="footer-sublinks">
+                <a href="#">iteac.io</a>
+                <a href="#">docs.iteac</a>
+                <a href="#">status.io</a>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+
+
+</body>
+
+<script th:src="@{/js/javascript_index.js}"></script>
+</html>
