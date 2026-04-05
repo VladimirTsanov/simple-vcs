@@ -13,6 +13,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import SAP.Project.simple_vcs.services.UserService;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+
 
 @Configuration
 @EnableWebSecurity
@@ -20,71 +24,77 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-        private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .csrf(AbstractHttpConfigurer::disable)
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authenticationProvider(authenticationProvider())
 
-                                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                                                .requestMatchers("/", "/index.html", "/login", "/login.html",
-                                                                "/register", "/register.html", "/favicon.ico",
-                                                                "/.well-known/**")
-                                                .permitAll()
-
-                                                .requestMatchers("/css/**", "/js/**", "/images/**", "/registration.js",
-                                                                "/loadDoc.js", "/loadMyDocs.js", "/createDoc.js")
-                                                .permitAll()
-
-                                                .requestMatchers("/documents", "/documents.html", "/api/auth/**",
-                                                                "/api/public/**",
-                                                                "/api/documents/all")
-                                                .permitAll()
-
-                                                .requestMatchers("/admin", "/admin.html", "/api/admin/**")
-                                                .hasAuthority("ROLE_ADMIN")
-
-                                                .requestMatchers("/my-documents", "/my_documents.html", "/new-document",
-                                                                "/new_document.html",
-                                                                "/api/user/**", "/api/documents/new",
-                                                                "/api/documents/my", "/api/versions/**")
-                                                .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+                        .requestMatchers("/registration", "/", "/index", "/file-info", "/file_template",
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
 
 
-                                                .anyRequest().authenticated())
+                        .requestMatchers("/css/**",
+                                "/js/**",
+                                "/images/**")
+                        .permitAll()
 
-                                .exceptionHandling(ex -> ex
-                                                .authenticationEntryPoint(authenticationEntryPoint)
-                                                .accessDeniedHandler(accessDeniedHandler))
 
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .requestMatchers("/admin")
+                        .hasAuthority("ROLE_ADMIN")
 
-                                .formLogin(form -> form
-                                                .loginPage("/login.html")
-                                                .loginProcessingUrl("/api/public/login")
-                                                .defaultSuccessUrl("/my-documents", true)
-                                                .failureUrl("/login.html?error=true")
-                                                .permitAll())
+                        .requestMatchers("/new-document","/document/**")
+                        .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+                        .anyRequest().authenticated())
 
-                                .logout(logout -> logout
-                                                .logoutUrl("/api/public/logout")
-                                                .logoutSuccessUrl("/login.html?logout")
-                                                .invalidateHttpSession(true)
-                                                .clearAuthentication(true)
-                                                .deleteCookies("JSESSIONID")
-                                                .permitAll())
 
-                                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
-                return http.build();
-        }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-                return new BCryptPasswordEncoder();
-        }
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll())
+
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+
+
+        return http.build();
+    }
+
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider(userService);
+
+        authProvider.setPasswordEncoder(passwordEncoder);
+
+        return authProvider;
+    }
 }

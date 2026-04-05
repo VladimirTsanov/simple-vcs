@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Home')}"></head>
+<body class="light-theme">
+
+<header th:replace="~{fragments/layout :: navbar}"></header>
+
+
+<h3 sec:authorize="isAuthenticated()">Welcome back, <span sec:authentication="principal.username">User</span>!</h3>
+<section class="about" sec:authorize="isAnonymous()">
+    <div class="about-content">
+
+
+        <h1>Don't just save it. Command it.</h1>
+
+
+        <p>Every great project is a journey of a thousand tiny iterations...</p>
+        <button onclick="goToPage()" th:data-url="@{/login}" id="loginBtn" class="cta-btn">Begin Your Journey</button>
+    </div>
+</section>
+
+
+<section class="discovery" sec:authorize="isAuthenticated()" >
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Your files:</h2>
+        <a th:href="@{/new-document}" class="cta-btn" style="text-decoration: none;">+ New Document</a>
+    </div>
+
+    <div class="card-container">
+
+        <a th:each="doc : ${documents}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
+                    <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}">Status</span></p>
+                </div>
+                <div class="card-body">
+                    <div class="file-preview">
+                        <div class="file-icon-placeholder">DOC</div>
+                    </div>
+                    <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
+                </div>
+                <div class="card-footer">
+                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+    </div>
+</section>
+
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+
+
+
+</body>
+
+<script src="js/javascript_index.js"></script>
+</html>

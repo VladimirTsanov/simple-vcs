@@ -22,6 +22,8 @@ public class Document {
     @Column(nullable = false, unique = true)
     private String title;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "active_version_id")
     private Version activeVersion;
@@ -32,6 +34,8 @@ public class Document {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Builder.Default
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Version> versions = new ArrayList<>();

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Document')}"></head>
+<body class="light-theme">
+
+
+<header th:replace="~{fragments/layout :: navbar}"></header>
+
+
+<div class="login-wrapper">
+    <div class="login-container" style="width: 50%; padding-top: 50px;">
+        <div class="shared-card">
+            <div class="form-content-area" style="width: 100%;">
+                <form th:action="@{/document/new}" method="post" class="form-section">
+                    <h2>Create New Document</h2>
+                    <p>Enter the details for your new document.</p>
+                    <div class="input-group">
+                        <label>Title</label>
+                        <input type="text" name="title" placeholder="Project Roadmap 2027" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Initial Content</label>
+                        <textarea name="content" rows="6" placeholder="Document content..." required
+                                  style="width: 100%; border: 1px solid rgba(0,0,0,0.2); border-radius: 8px; padding: 10px;"></textarea>
+                    </div>
+                    <button type="submit" class="login-submit">Save Document</button>
+                    <p class="switch-text"><a th:href="@{/}" style="color:var(--text-color);">Cancel and return home</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+
+</body>
+
+<script src="js/javascript_index.js"></script>
+</html>

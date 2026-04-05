@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error - ITEAC</title>
+    <link rel="stylesheet" th:href="@{/css/style_index.css}">
+</head>
+<body class="light-theme">
+
+<header class="navbar">
+    <div class="logo">
+        <span class="logo_name">ITEAC</span>
+    </div>
+    <nav>
+        <ul id="nav-list">
+            <li><a th:href="@{/}" class="nav-btn">Home</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="error-container">
+    <h1 class="error-code" th:text="${errorCode != null ? errorCode : 'Oops!'}">Error</h1>
+    <p class="error-message" th:text="${errorMessage != null ? errorMessage : 'Something went wrong.'}">Message</p>
+    <a th:href="@{/}" class="cta-btn">Return Home</a>
+</div>
+
+</body>
+</html>

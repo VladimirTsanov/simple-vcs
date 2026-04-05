@@ -26,7 +26,7 @@ public class AuthController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Registration Successful");
-        response.put("redirectUrl", "/login.html?registered=true");
+        response.put("redirectUrl", "/login_register.html?registered=true");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

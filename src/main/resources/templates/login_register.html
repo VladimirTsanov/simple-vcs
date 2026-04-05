@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Login&Register')}"></head>
+<body class="light-theme">
+
+
+<header th:replace="~{fragments/layout :: navbar}"></header>
+
+
+
+
+<div class="login-wrapper">
+    <div class="login-container">
+        <div class="shared-card">
+
+            <div class="form-content-area">
+
+
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger">Invalid username or
+                        password.</div>
+                </div>
+                <div th:if="${param.success}">
+                    <h1>SUCCESSSFULLLL REGISTRAATION</h1>
+                </div>
+                <div th:if="${param.logout}">
+                    <div class="alert alert-info">You have been logged out.</div>
+                </div>
+
+
+
+
+
+                <form th:action="@{/login}" method="post" id="login-side" class="form-section">
+
+                    <h2>Welcome Back</h2>
+                    <p>Enter your details to manage your workspace.</p>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="user@example.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="••••••••••••" required>
+                    </div>
+                    <button type="submit" class="login-submit">Login to Dashboard</button>
+                    <p class="switch-text">Don't have an account? <span onclick="toggleForms()">Create one here</span></p>
+                </form>
+
+
+
+
+                <form th:action="@{/registration}" method="post" th:object="${user}" id="register-side" class="form-section hidden">
+                    <h2>Join Us</h2>
+                    <p>Create your account to start your journey.</p>
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" th:field="*{username}" placeholder="johndoe" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" th:field="*{email}" placeholder="newuser@example.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Create Password</label>
+                        <input type="password" th:field="*{password}" placeholder="••••••••••••" required>
+                    </div>
+                    <button type="submit" class="login-submit">Create Account</button>
+                    <p class="switch-text">Already have an account? <span onclick="toggleForms()">Login here</span></p>
+                </form>
+
+            </div>
+
+            <div class="vertical-divider"></div>
+
+            <div class="empty-space"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+
+</body>
+
+<script th:src="@{/js/javascript_index.js}"></script>
+</html>

@@ -46,4 +46,13 @@ public class DocumentService {
         return documentRepository.findByActiveVersionAuthorId(authorId);
     }
 
+
+
+
+
+    public Document getDocumentById(Long documentId) throws SAP.Project.simple_vcs.exception.DocumentNotFoundException {
+        return documentRepository.findById(documentId)
+                .orElseThrow(() -> new SAP.Project.simple_vcs.exception.DocumentNotFoundException("Document with id " + documentId + " not found"));
+    }
+
 }
