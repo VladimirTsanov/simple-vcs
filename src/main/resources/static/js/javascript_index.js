@@ -7,8 +7,10 @@ const themeBtn = document.getElementById('theme-switcher');
 const body = document.body;
 
 themeBtn.addEventListener('click', () => {
+    // 1. Toggle the class
     body.classList.toggle('dark-theme');
-    
+
+    // 2. Save the current state to LocalStorage
     if (body.classList.contains('dark-theme')) {
         localStorage.setItem('theme', 'dark');
     } else {
@@ -16,7 +18,7 @@ themeBtn.addEventListener('click', () => {
     }
 });
 
-
+// Run this immediately on page load
 (function() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -25,6 +27,9 @@ themeBtn.addEventListener('click', () => {
         document.body.classList.remove('dark-theme');
     }
 })();
+
+
+
 
 
 function toggleForms() {
@@ -41,6 +46,9 @@ function toggleForms() {
         login.classList.add('hidden');
     }
 }
+
+
+
 
 
 function goToPage() {

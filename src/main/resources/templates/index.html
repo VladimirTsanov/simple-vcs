@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>ITEAC</title>
@@ -35,7 +35,10 @@
         <ul id="nav-list">
             <li><a th:href="@{/}" class="nav-btn" onclick="setActive(this)">Home</a></li>
             <li><a href="#myfooter" class="nav-btn" onclick="setActive(this)">About us</a></li>
-            <li><a th:href="@{/login}" class="nav-btn" onclick="setActive(this)">Login</a></li>
+
+            <li sec:authorize="isAnonymous()"><a th:href="@{/login}" class="nav-btn" onclick="setActive(this)">Login</a></li>
+
+            <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="nav-btn" onclick="setActive(this)">Logout</a></li>
         </ul>
     </nav>
 
@@ -49,9 +52,12 @@
 
 <section class="about">
     <div class="about-content">
+        <h3 sec:authorize="isAuthenticated()">Welcome back, <span sec:authentication="principal.username">User</span>!</h3>
+
         <h1>Don't just save it. Command it.</h1>
-        <p>Every great project is a journey of a thousand tiny iterations.
-            ITEAC is the digital ledger for your creative process, capturing every pivot and breakthrough so you never have to fear</p>
+
+
+        <p>Every great project is a journey of a thousand tiny iterations...</p>
         <button onclick="goToPage()" th:data-url="@{/login}" id="loginBtn" class="cta-btn">Begin Your Journey</button>
     </div>
 </section>
@@ -73,7 +79,7 @@
 
     <div class="card-container">
 
-        <a th:href="@{/file_template}" class="file-link">
+        <a th:href="@{/file-info}" class="file-link">
             <div class="card">
                 <div class="card-header">
                     <h3 class="file-title">Project_Proposal.pdf</h3>

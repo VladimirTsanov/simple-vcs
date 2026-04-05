@@ -1111,3 +1111,32 @@ nav ul {
     border: 1px solid #30363d;
 }
 .dark-theme .file-title { color: #00ffaa; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.alert-danger {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+.alert-info {
+    background-color: #d9edf7;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+}

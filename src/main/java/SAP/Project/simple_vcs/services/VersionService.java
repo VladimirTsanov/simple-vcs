@@ -2,6 +2,9 @@ package SAP.Project.simple_vcs.services;
 
 import java.util.List;
 
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+import SAP.Project.simple_vcs.exception.UserNotFoundException;
+import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +26,12 @@ public class VersionService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Version createNewVersion(VersionRequest request) {
+    public Version createNewVersion(VersionRequest request, Long authorId) throws UserNotFoundException, DocumentNotFoundException {
         Document document = documentRepository.findById(request.documentId())
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id" + request.documentId() + " not found"));
         
-        User author = userRepository.findById(request.authorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + authorId +" not found"));
 
         // Automatically calculate the next version number
         int nextVersionNumber = document.getVersions().size() + 1;
@@ -44,9 +47,9 @@ public class VersionService {
         return versionRepository.save(newVersion);
     }
 
-    public List<Version> getVersionsForDocument(Long documentId) {
+    public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
         Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id" + documentId + " not found"));
         return document.getVersions();
     }
 }
