@@ -36,6 +36,6 @@ public class UserRegistrationController {
     public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto) {
         System.out.println("Form received for user: " + registrationDto.getUsername()); // Add this log!
         userService.registerUser(registrationDto);
-        return "redirect:/login?success"; // Redirect to login so they can sign in!
+        return "redirect:/login?logout_success"; // Redirect to login so they can sign in!
     }
 }

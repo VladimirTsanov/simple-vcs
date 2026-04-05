@@ -16,65 +16,59 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException ex) {
-        return new ResponseEntity<>(
-                Map.of("error", "403 Forbidden", "message", "Access denied from the security system."),
-                HttpStatus.FORBIDDEN
-        );
+    public org.springframework.web.servlet.ModelAndView handleAccessDeniedException(AccessDeniedException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "403 Forbidden");
+        mav.addObject("errorMessage", "Access denied from the security system.");
+        return mav;
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.NOT_FOUND);
-        body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    public org.springframework.web.servlet.ModelAndView handleNotFound(ResourceNotFoundException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "404 Not Found");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Conflict");
-        error.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    public org.springframework.web.servlet.ModelAndView handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "409 Conflict");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Not Found");
-        error.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public org.springframework.web.servlet.ModelAndView handleUserNotFound(UserNotFoundException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "404 Not Found");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
     }
 
     @ExceptionHandler(VersionNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleVersionNotFound(VersionNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Not Found");
-        error.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public org.springframework.web.servlet.ModelAndView handleVersionNotFound(VersionNotFoundException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "404 Not Found");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
     }
 
     @ExceptionHandler(DocumentNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleDocumentNotFound(DocumentNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", "Not Found");
-        error.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    public org.springframework.web.servlet.ModelAndView handleDocumentNotFound(DocumentNotFoundException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "404 Not Found");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAll(Exception ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Something went wrong. Try again later");
-        return ResponseEntity.status(500).body(response);
+    public org.springframework.web.servlet.ModelAndView handleAll(Exception ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "500 Internal Server Error");
+        mav.addObject("errorMessage", "Something went wrong. Try again later: " + ex.getMessage());
+        return mav;
     }
 
 }

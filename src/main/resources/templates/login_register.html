@@ -1,45 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>ITEAC</title>
-    <link rel="stylesheet" th:href="@{/css/style_index.css}">
-</head>
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Login&Register')}"></head>
 <body class="light-theme">
 
-<header class="navbar">
-    <div class="logo">
-        <button id="theme-switcher" class="theme-btn">
-            <div class="light-state-icon">
-                <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default">
-                <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover">
-            </div>
 
-            <div class="dark-state-icon">
-                <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default">
-                <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover">
-            </div>
-        </button>
-
-        <span class="logo_name">ITEAC</span>
-    </div>
-
-    <input type="checkbox" id="menu-toggle" class="menu-toggle">
-    <label for="menu-toggle" class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </label>
-
-    <nav>
-        <ul id="nav-list">
-            <li><a th:href="@{/}" class="nav-btn" onclick="setActive(this)">Home</a></li>
-            <li><a href="#myfooter" class="nav-btn" onclick="setActive(this)">About us</a></li>
-            <li><a th:href="@{/login}" class="nav-btn" onclick="setActive(this)">Login</a></li>
-        </ul>
-    </nav>
-
-</header>
+<header th:replace="~{fragments/layout :: navbar}"></header>
 
 
 
@@ -136,74 +101,7 @@
 
 
 
-
-
-<footer class="footer" id="myfooter">
-    <div class="footer-container">
-
-        <div class="footer-top">
-            <div class="footer-brand">
-                <span class="footer-logo">ITEAC</span>
-                <div class="social-icons">
-                    <a href="#">FB</a>
-                    <a href="#">IG</a>
-                    <a href="#">TW</a>
-                    <a href="#">YT</a>
-                </div>
-            </div>
-
-        </div>
-
-        <hr class="footer-divider">
-
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3>About ITEAC</h3>
-                <ul>
-                    <li><a href="#">About us</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Blog</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Help & Support</h3>
-                <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Community Forum</a></li>
-                    <li><a href="#">API Status</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Developers</h3>
-                <ul>
-                    <li><a href="#">GitHub Repo</a></li>
-                    <li><a href="#">Open Source</a></li>
-                    <li><a href="#">Release Notes</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <hr class="footer-divider">
-
-        <div class="footer-bottom">
-            <div class="footer-copyright">
-                © 2008-2026 ITEAC. All rights reserved. | <a href="#">Sitemap</a>
-            </div>
-            <div class="footer-sublinks">
-                <a href="#">iteac.io</a>
-                <a href="#">docs.iteac</a>
-                <a href="#">status.io</a>
-            </div>
-        </div>
-
-    </div>
-</footer>
-
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 
 </body>

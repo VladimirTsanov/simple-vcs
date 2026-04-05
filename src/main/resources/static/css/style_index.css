@@ -1140,3 +1140,27 @@ nav ul {
     color: #31708f;
     border: 1px solid #bce8f1;
 }
+
+
+
+
+
+
+
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+            text-align: center;
+        }
+        .error-code {
+            font-size: 4rem;
+            color: #d9534f;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }

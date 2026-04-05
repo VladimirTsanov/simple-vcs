@@ -1,58 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>ITEAC</title>
-    <link rel="stylesheet" th:href="@{css/style_index.css}">
-</head>
+
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Home')}"></head>
 <body class="light-theme">
 
-<header class="navbar">
-    <div class="logo">
-        <button id="theme-switcher" class="theme-btn">
-            <div class="light-state-icon">
-                <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default">
-                <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover">
-            </div>
-
-            <div class="dark-state-icon">
-                <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default">
-                <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover">
-            </div>
-        </button>
-
-        <span class="logo_name">ITEAC</span>
-    </div>
-
-    <input type="checkbox" id="menu-toggle" class="menu-toggle">
-    <label for="menu-toggle" class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-    </label>
-
-    <nav>
-        <ul id="nav-list">
-            <li><a th:href="@{/}" class="nav-btn" onclick="setActive(this)">Home</a></li>
-            <li><a href="#myfooter" class="nav-btn" onclick="setActive(this)">About us</a></li>
-
-            <li sec:authorize="isAnonymous()"><a th:href="@{/login}" class="nav-btn" onclick="setActive(this)">Login</a></li>
-
-            <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="nav-btn" onclick="setActive(this)">Logout</a></li>
-        </ul>
-    </nav>
-
-</header>
+<header th:replace="~{fragments/layout :: navbar}"></header>
 
 
-
-
-
-
-
-<section class="about">
+<h3 sec:authorize="isAuthenticated()">Welcome back, <span sec:authentication="principal.username">User</span>!</h3>
+<section class="about" sec:authorize="isAnonymous()">
     <div class="about-content">
-        <h3 sec:authorize="isAuthenticated()">Welcome back, <span sec:authentication="principal.username">User</span>!</h3>
+
 
         <h1>Don't just save it. Command it.</h1>
 
@@ -63,33 +21,25 @@
 </section>
 
 
-
-
-
-
-
-
-
-
-
-
-
-<section class="discovery">
-    <h2>Your files:</h2>
+<section class="discovery" sec:authorize="isAuthenticated()" >
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Your files:</h2>
+        <a th:href="@{/new-document}" class="cta-btn" style="text-decoration: none;">+ New Document</a>
+    </div>
 
     <div class="card-container">
 
-        <a th:href="@{/file-info}" class="file-link">
+        <a th:each="doc : ${documents}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="file-title">Project_Proposal.pdf</h3>
-                    <p class="file-date">Changed: 2 hours ago</p>
+                    <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
+                    <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}">Status</span></p>
                 </div>
                 <div class="card-body">
                     <div class="file-preview">
-                        <div class="file-icon-placeholder">PDF</div>
+                        <div class="file-icon-placeholder">DOC</div>
                     </div>
-                    <p class="file-desc">Q3 Workspace roadmap and budget allocations.</p>
+                    <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
                 </div>
                 <div class="card-footer">
                     <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -102,107 +52,12 @@
             </div>
         </a>
 
-
-
-        <a href=""><div class="card">
-
-
-
-        </div></a>
-
-
-
-        <a href=""><div class="card">
-
-
-
-        </div></a>
-
-
     </div>
 </section>
 
 
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<footer class="footer" id="myfooter">
-    <div class="footer-container">
-
-        <div class="footer-top">
-            <div class="footer-brand">
-                <span class="footer-logo">ITEAC</span>
-                <div class="social-icons">
-                    <a href="#">FB</a>
-                    <a href="#">IG</a>
-                    <a href="#">TW</a>
-                    <a href="#">YT</a>
-                </div>
-            </div>
-
-        </div>
-
-        <hr class="footer-divider">
-
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h3>About ITEAC</h3>
-                <ul>
-                    <li><a href="#">About us</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Careers</a></li>
-                    <li><a href="#">Blog</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Help & Support</h3>
-                <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">FAQ</a></li>
-                    <li><a href="#">Community Forum</a></li>
-                    <li><a href="#">API Status</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Developers</h3>
-                <ul>
-                    <li><a href="#">GitHub Repo</a></li>
-                    <li><a href="#">Open Source</a></li>
-                    <li><a href="#">Release Notes</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <hr class="footer-divider">
-
-        <div class="footer-bottom">
-            <div class="footer-copyright">
-                © 2008-2026 ITEAC. All rights reserved. | <a href="#">Sitemap</a>
-            </div>
-            <div class="footer-sublinks">
-                <a href="#">iteac.io</a>
-                <a href="#">docs.iteac</a>
-                <a href="#">status.io</a>
-            </div>
-        </div>
-
-    </div>
-</footer>
 
 
 

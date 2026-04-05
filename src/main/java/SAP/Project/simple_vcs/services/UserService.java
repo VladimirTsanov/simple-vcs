@@ -144,16 +144,11 @@ public class UserService implements UserDetailsService{
             throw new UsernameNotFoundException("Invalid email or password.");
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(), // Change user.getEmail() to user.getUsername()
-                user.getPasswordHash(),
-                user.isActive(),
-                true,
-                true,
-                true,
-                mapRolesToAuthorities(user.getRoles())
-        );
+        return new SAP.Project.simple_vcs.security.CustomUserDetails(user);
     }
+
+
+
 
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {

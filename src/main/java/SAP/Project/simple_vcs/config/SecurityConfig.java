@@ -24,96 +24,68 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-        private final CustomAccessDeniedHandler accessDeniedHandler;
-        private final UserService userService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .csrf(AbstractHttpConfigurer::disable)
-                        .authenticationProvider(authenticationProvider())
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authenticationProvider(authenticationProvider())
 
-                                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                                                .requestMatchers("/registration", "/", "/index", "/file-info", "/file_template",
-                                                        "/login",
-                                                        "/css/**",
-                                                        "/js/**",
-                                                        "/images/**"
-                                                ).permitAll()
-
-
+                        .requestMatchers("/registration", "/", "/index", "/file-info", "/file_template",
+                                "/login",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
 
 
+                        .requestMatchers("/css/**",
+                                "/js/**",
+                                "/images/**")
+                        .permitAll()
 
 
-                                        .requestMatchers("/css/**", "/js/**", "/images/**", "/registration.js",
-                                                                "/loadDoc.js", "/loadMyDocs.js", "/createDoc.js")
-                                                .permitAll()
+                        .requestMatchers("/admin")
+                        .hasAuthority("ROLE_ADMIN")
 
-
-
-
-
-                                                .requestMatchers("/documents",  "/api/auth/**",
-                                                                "/api/public/**",
-                                                                "/api/documents/all")
-                                                .permitAll()
+                        .requestMatchers("/new-document","/document/**")
+                        .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+                        .anyRequest().authenticated())
 
 
 
 
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
-                                                .requestMatchers("/admin", "/api/admin/**")
-                                                .hasAuthority("ROLE_ADMIN")
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("email")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
 
-                                                .requestMatchers("/my-documents", "/new-document",  "/file-info",
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll())
 
-                                                                "/api/user/**", "/api/documents/new",
-                                                                "/api/documents/my", "/api/versions/**")
-                                                .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
-
-
-                                                .anyRequest().authenticated())
-
-
-
-
-
-
-
-
-
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-
-                        .formLogin(form -> form
-                                .loginPage("/login")
-                                .loginProcessingUrl("/login")
-                                        .usernameParameter("email")
-                                .defaultSuccessUrl("/", true)
-                                .failureUrl("/login?error=true")
-                                .permitAll()
-                        )
-
-                                .logout(logout -> logout
-//                                        .logoutUrl("/api/public/logout")
-                                        .logoutUrl("/logout")
-                                        .logoutSuccessUrl("/login?logout=true")
-//                                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//
-                                        .invalidateHttpSession(true)
-                                        .clearAuthentication(true)
-                                        .deleteCookies("JSESSIONID")
-                                        .permitAll())
-
-                                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
 
-                return http.build();
-        }
+        return http.build();
+    }
 
 
     @Bean
