@@ -99,7 +99,7 @@ public class SecurityConfig {
                         )
 
                                 .logout(logout -> logout
-                                        .logoutUrl("/api/public/logout")
+                                        .logoutUrl("/logout")
                                         .logoutSuccessUrl("/login?logout=true")
 //                                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 
