@@ -40,7 +40,8 @@ public class DocumentWebController {
 
     @GetMapping("/document/{id}")
     public String viewDocument(@PathVariable Long id, Model model) throws DocumentNotFoundException {
-
+        Document document = documentService.getDocumentById(id);
+        model.addAttribute("document", document);
         return "file_template";
     }
 
