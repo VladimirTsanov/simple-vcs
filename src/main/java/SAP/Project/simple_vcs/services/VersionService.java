@@ -2,6 +2,7 @@ package SAP.Project.simple_vcs.services;
 
 import java.util.List;
 
+import SAP.Project.simple_vcs.exception.AccessDeniedException;
 import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
 import SAP.Project.simple_vcs.exception.UserNotFoundException;
 import SAP.Project.simple_vcs.exception.VersionNotFoundException;
@@ -47,9 +48,25 @@ public class VersionService {
         return versionRepository.save(newVersion);
     }
 
-    public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
+   /* public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id" + documentId + " not found"));
         return document.getVersions();
+    }*/
+
+    @Transactional(readOnly = true)
+    public List<Version> getVersionsForDocument(Long documentId, Long userId, boolean isAdmin)
+            throws DocumentNotFoundException, AccessDeniedException {
+
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + documentId + " not found"));
+
+        // Проверка за сигурност: Ако не си админ, трябва да си автор на текущата версия
+        // (Тъй като в Document няма поле owner, ползваме автора на активната версия за проверка)
+        if (!isAdmin && !document.getActiveVersion().getAuthor().getId().equals(userId)) {
+            throw new AccessDeniedException("Нямате право да виждате историята на този документ!");
+        }
+
+        return versionRepository.findByDocumentIdOrderByVersionNumberDesc(documentId);
     }
 }
