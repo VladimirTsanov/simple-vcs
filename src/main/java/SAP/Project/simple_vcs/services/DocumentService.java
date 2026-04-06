@@ -39,20 +39,19 @@ public class DocumentService {
         document.getVersions().add(v1);
         return documentRepository.save(document);
     }
+
     public List<Document> getAllDocuments() {
         return documentRepository.findAll();
     }
+
     public List<Document> getPersonalDocuments(Long authorId) {
         return documentRepository.findByActiveVersionAuthorId(authorId);
     }
 
-
-
-
-
     public Document getDocumentById(Long documentId) throws SAP.Project.simple_vcs.exception.DocumentNotFoundException {
         return documentRepository.findById(documentId)
-                .orElseThrow(() -> new SAP.Project.simple_vcs.exception.DocumentNotFoundException("Document with id " + documentId + " not found"));
+                .orElseThrow(() -> new SAP.Project.simple_vcs.exception.DocumentNotFoundException(
+                        "Document with id " + documentId + " not found"));
     }
 
 }

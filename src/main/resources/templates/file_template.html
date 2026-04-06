@@ -1,78 +1,77 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{fragments/layout :: common_head('ITEAC - Home')}"></head>
+
 <body class="light-theme">
 
-<header th:replace="~{fragments/layout :: navbar}"></header>
+    <header th:replace="~{fragments/layout :: navbar}"></header>
 
+    <div class="file-page-wrapper">
+        <div class="glass-card file-details-card">
 
+            <header class="file-header">
+                <h1 class="file-title" th:text="${document.title}">Project_Proposal_v2.pdf</h1>
 
+                <svg class="trash-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 11v6m4-6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
 
+            </header>
 
-
-
-<div class="file-page-wrapper">
-    <div class="glass-card file-details-card">
-
-        <header class="file-header">
-            <h1 class="file-title">Project_Proposal_v2.pdf</h1>
-
-            <svg class="trash-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10 11v6m4-6v6"
-                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-
-        </header>
-
-        <div class="file-info-block">
-            <div class="file-preview">
-                <div class="file-icon-placeholder">PDF</div>
+            <div class="file-info-block">
+                <div class="file-preview">
+                    <div class="file-icon-placeholder">DOC</div>
+                </div>
+                <div class="file-description">
+                    <h3>Content</h3>
+                    <p
+                        th:text="${document.activeVersion != null ? document.activeVersion.content : 'No active content available'}">
+                        This file contains the updated workspace management proposal for the 2026 Q3 roadmap. It
+                        includes budget allocations, team structures, and the final design mockups for the ITEAC
+                        dashboard.</p>
+                </div>
             </div>
-            <div class="file-description">
-                <h3>Description</h3>
-                <p>This file contains the updated workspace management proposal for the 2026 Q3 roadmap. It includes budget allocations, team structures, and the final design mockups for the ITEAC dashboard.</p>
+
+            <div class="section-divider"></div>
+
+            <div class="file-versions-block">
+                <h3>Version History</h3>
+                <table class="version-table">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                            <th>Author</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="version : ${document.versions}">
+                            <td th:text="'v' + ${version.versionNumber}">v2.1</td>
+                            <td th:text="${#temporals.format(version.createdAt, 'MMM dd, yyyy HH:mm')}">Oct 24, 2026
+                            </td>
+                            <td>
+                                <span th:class="'status-tag ' + (${version.status.name() == 'DRAFT' ? 'archived' : ''})"
+                                    th:text="${version.status}">Current</span>
+                            </td>
+                            <td th:text="${version.author != null ? version.author.username : 'Unknown'}">Author</td>
+                            <td>
+                                <!-- TODO: Implement revert logic -->
+                                <button class="action-btn revert">Revert</button>
+                                <!-- TODO: Implement delete logic -->
+                                <button class="action-btn delete">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <div class="section-divider"></div>
-
-        <div class="file-versions-block">
-            <h3>Version History</h3>
-            <table class="version-table">
-                <thead>
-                <tr>
-                    <th>Version</th>
-                    <th>Last Change</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>v2.1</td>
-                    <td>Oct 24, 2026</td>
-                    <td><span class="status-tag">Current</span></td>
-                    <td>
-                        <button class="action-btn revert">Revert</button>
-                        <button class="action-btn delete">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>v2.0</td>
-                    <td>Oct 15, 2026</td>
-                    <td><span class="status-tag archived">Archived</span></td>
-                    <td>
-                        <button class="action-btn revert">Revert</button>
-                        <button class="action-btn delete">Delete</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </div>
-</div>
 
 
 
@@ -99,10 +98,11 @@
 
 
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 
 </body>
 
 <script src="js/javascript_index.js"></script>
+
 </html>
