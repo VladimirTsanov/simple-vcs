@@ -37,6 +37,7 @@ public class Document {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default
+    @OrderBy("versionNumber DESC")
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Version> versions = new ArrayList<>();
 

@@ -37,6 +37,46 @@
             </div>
 
             <div class="section-divider"></div>
+            <!-- Секция за сравнение на версии -->
+            <div class="comparison-section" style="margin: 30px 0; padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="margin-bottom: 15px;">Compare Versions</h3>
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>Source Version (Old):</label>
+                        <select id="oldVersionId" class="nav-btn" style="width: 200px; background: white;">
+                            <option value="" disabled selected>Select version</option>
+                            <option th:each="v : ${document.versions}"
+                                    th:value="${v.id}"
+                                    th:text="'Version ' + ${v.versionNumber} + ' (' + ${v.status} + ')'">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>Target Version (New):</label>
+                        <select id="newVersionId" class="nav-btn" style="width: 200px; background: white;">
+                            <option value="" disabled selected>Select version</option>
+                            <option th:each="v : ${document.versions}"
+                                    th:value="${v.id}"
+                                    th:text="'Version ' + ${v.versionNumber} + ' (' + ${v.status} + ')'">
+                            </option>
+                        </select>
+                    </div>
+
+                    <button onclick="compareSelectedVersions()" class="cta-btn" style="height: 45px;">Compare Now</button>
+                </div>
+
+                <!-- Контейнер за резултатите (първоначално скрит) -->
+                <div id="diff-container" class="hidden" style="margin-top: 25px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
+                    <div style="background: #f6f8fa; padding: 10px; border-bottom: 1px solid #ddd; font-weight: bold;">
+                        Visual Diff Results:
+                    </div>
+                    <div id="diff-results" style="background: white; font-family: 'Courier New', Courier, monospace; font-size: 14px; line-height: 1.5;">
+                        <!-- Тук JS ще вкара редовете -->
+                    </div>
+                </div>
+            </div>
 
             <div class="file-versions-block">
                 <h3>Version History</h3>
@@ -73,7 +113,7 @@
                 <table class="version-table">
                     <thead>
                     <tr>
-                        <th>Select</th> <!-- Нов стълб -->
+
                         <th>Version</th>
                         <th>Created At</th>
                         <th>Status</th>
@@ -82,11 +122,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="version : ${document.versions}">
-                        <td>
-                            <!-- Радио бутони за избор на 'Стара' и 'Нова' версия -->
-                            <input type="radio" name="oldVersion" th:value="${version.id}">
-                            <input type="radio" name="newVersion" th:value="${version.id}">
-                        </td>
+
                         <td th:text="'v' + ${version.versionNumber}"></td>
                         <td th:text="${#temporals.format(version.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
                         <td th:text="${version.status}"></td>
@@ -94,7 +130,7 @@
                     </tr>
                     </tbody>
                 </table>
-                <button class="cta-btn" onclick="handleComparison()" style="margin-top: 20px;">Compare Selected Versions</button>
+
             </div>
             <div id="diff-display" style="margin-top: 30px; white-space: pre-wrap; font-family: monospace; border: 1px solid #ddd; padding: 20px; background: #f9f9f9; display: none;">
                 <h3>Changes:</h3>
@@ -108,6 +144,8 @@
 
 </body>
 
-<script src="js/javascript_index.js"></script>
+<!--<script src="js/javascript_index.js"></script>-->
+<!-- Използвай Thymeleaf синтаксис, за да гарантираш правилния път от корена (/) -->
+<script th:src="@{/js/javascript_index.js}"></script>
 
 </html>
