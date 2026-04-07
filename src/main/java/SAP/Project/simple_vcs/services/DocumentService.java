@@ -54,4 +54,10 @@ public class DocumentService {
                         "Document with id " + documentId + " not found"));
     }
 
+    @Transactional
+    public void deleteDocument(Long documentId) throws SAP.Project.simple_vcs.exception.DocumentNotFoundException {
+        Document document = getDocumentById(documentId);
+        documentRepository.delete(document);
+    }
+
 }

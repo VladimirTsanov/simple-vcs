@@ -62,6 +62,10 @@ public class UserService implements UserDetailsService{
         userRepository.save(user);
     }
 
+    public List<Role> getAllRoles() {
+        return roleRepository.findAll();
+    }
+
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::mapToResponseDto)

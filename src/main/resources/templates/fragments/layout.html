@@ -13,13 +13,13 @@
         <div class="logo">
             <button id="theme-switcher" class="theme-btn">
                 <div class="light-state-icon">
-                    <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default">
-                    <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover">
+                    <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default-light">
+                    <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover-light">
                 </div>
 
                 <div class="dark-state-icon">
-                    <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default">
-                    <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover">
+                    <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default-dark">
+                    <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover-dark">
                 </div>
             </button>
 
@@ -33,6 +33,7 @@
         <ul id="nav-list">
             <li><a th:href="@{/}" class="nav-btn">Home</a></li>
             <li><a href="#myfooter" class="nav-btn">About us</a></li>
+            <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/users}" class="nav-btn">Admin</a></li>
             <li sec:authorize="isAnonymous()"><a th:href="@{/login}" class="nav-btn">Login</a></li>
             <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="nav-btn">Logout</a></li>
         </ul>

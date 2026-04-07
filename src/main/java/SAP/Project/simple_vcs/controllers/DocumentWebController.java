@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -27,11 +28,10 @@ public class DocumentWebController {
     private final DocumentService documentService;
     private final VersionService versionService;
 
-
     @PostMapping("/document/new")
     public String createDocument(@RequestParam String title,
-                                 @RequestParam String content,
-                                 @AuthenticationPrincipal CustomUserDetails userDetails) throws UserNotFoundException {
+            @RequestParam String content,
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws UserNotFoundException {
         Long authorId = userDetails.getUser().getId();
         DocumentRequest request = new DocumentRequest(title, content);
         documentService.createDocument(request, authorId);
@@ -45,14 +45,21 @@ public class DocumentWebController {
         return "file_template";
     }
 
-
     @PostMapping("/document/{id}/version/new")
     public String createVersion(@PathVariable Long id,
-                                @RequestParam String content,
-                                @AuthenticationPrincipal CustomUserDetails userDetails) throws UserNotFoundException, DocumentNotFoundException {
+            @RequestParam String content,
+            @AuthenticationPrincipal CustomUserDetails userDetails)
+            throws UserNotFoundException, DocumentNotFoundException {
         Long authorId = userDetails.getUser().getId();
         VersionRequest request = new VersionRequest(id, content);
         versionService.createNewVersion(request, authorId);
         return "redirect:/document/" + id;
+    }
+
+    @PostMapping("/document/{id}/delete")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_AUTHOR')")
+    public String deleteDocument(@PathVariable Long id) throws DocumentNotFoundException {
+        documentService.deleteDocument(id);
+        return "redirect:/";
     }
 }
