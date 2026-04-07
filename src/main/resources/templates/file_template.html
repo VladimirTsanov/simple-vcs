@@ -40,7 +40,7 @@
 
             <div class="file-versions-block">
                 <h3>Version History</h3>
-                <table class="version-table">
+                <!--<table class="version-table">
                     <thead>
                         <tr>
                             <th>Version</th>
@@ -61,42 +61,47 @@
                             </td>
                             <td th:text="${version.author != null ? version.author.username : 'Unknown'}">Author</td>
                             <td>
-                                <!-- TODO: Implement revert logic -->
+                                 TODO: Implement revert logic
                                 <button class="action-btn revert">Revert</button>
-                                <!-- TODO: Implement delete logic -->
+                                 TODO: Implement delete logic
                                 <button class="action-btn delete">Delete</button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                -->
+                <table class="version-table">
+                    <thead>
+                    <tr>
+                        <th>Select</th> <!-- Нов стълб -->
+                        <th>Version</th>
+                        <th>Created At</th>
+                        <th>Status</th>
+                        <th>Author</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="version : ${document.versions}">
+                        <td>
+                            <!-- Радио бутони за избор на 'Стара' и 'Нова' версия -->
+                            <input type="radio" name="oldVersion" th:value="${version.id}">
+                            <input type="radio" name="newVersion" th:value="${version.id}">
+                        </td>
+                        <td th:text="'v' + ${version.versionNumber}"></td>
+                        <td th:text="${#temporals.format(version.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${version.status}"></td>
+                        <td th:text="${version.author.username}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button class="cta-btn" onclick="handleComparison()" style="margin-top: 20px;">Compare Selected Versions</button>
+            </div>
+            <div id="diff-display" style="margin-top: 30px; white-space: pre-wrap; font-family: monospace; border: 1px solid #ddd; padding: 20px; background: #f9f9f9; display: none;">
+                <h3>Changes:</h3>
+                <div id="diff-content"></div>
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
