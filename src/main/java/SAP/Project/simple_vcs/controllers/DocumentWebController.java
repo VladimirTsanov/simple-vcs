@@ -50,6 +50,7 @@ public class DocumentWebController {
     }
 
     @PostMapping("/document/{id}/version/new")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_REVIEWER', 'ROLE_AUTHOR')")
     public String createVersion(@PathVariable Long id,
             @RequestParam String content,
             @AuthenticationPrincipal CustomUserDetails userDetails)
@@ -60,8 +61,22 @@ public class DocumentWebController {
         return "redirect:/document/" + id;
     }
 
+    @PostMapping("/document/{id}/share")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_REVIEWER', 'ROLE_AUTHOR')")
+    public String shareDocument(@PathVariable Long id,
+            @RequestParam String emailOrUsername,
+            RedirectAttributes redirectAttributes) {
+        try {
+            documentService.shareDocument(id, emailOrUsername);
+            redirectAttributes.addFlashAttribute("successMessage", "Document shared with " + emailOrUsername);
+        } catch (DocumentNotFoundException | UserNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/document/" + id;
+    }
+
     @PostMapping("/document/{docId}/version/{versionId}/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_AUTHOR', 'ROLE_REVIEWER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_REVIEWER', 'ROLE_AUTHOR')")
     public String updateVersionStatus(@PathVariable Long docId,
             @PathVariable Long versionId,
             @RequestParam VersionStatus newStatus,

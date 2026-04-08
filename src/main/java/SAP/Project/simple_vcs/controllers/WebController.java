@@ -19,7 +19,23 @@ public class WebController {
     @GetMapping("/")
     public String home(Model model, @org.springframework.security.core.annotation.AuthenticationPrincipal SAP.Project.simple_vcs.security.CustomUserDetails userDetails) {
         if (userDetails != null) {
-            model.addAttribute("documents", documentService.getPersonalDocuments(userDetails.getUser().getId()));
+            Long userId = userDetails.getUser().getId();
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean isReviewer = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_REVIEWER"));
+            if (isAdmin || isReviewer) {
+                model.addAttribute("documents", documentService.getAllDocuments());
+            } else {
+                java.util.List<SAP.Project.simple_vcs.entity.Document> docs = new java.util.ArrayList<>(
+                        documentService.getPersonalDocuments(userId));
+                documentService.getDocumentsSharedWithUser(userId).forEach(d -> {
+                    if (docs.stream().noneMatch(existing -> existing.getId().equals(d.getId()))) {
+                        docs.add(d);
+                    }
+                });
+                model.addAttribute("documents", docs);
+            }
         } else {
             model.addAttribute("documents", java.util.Collections.emptyList());
         }

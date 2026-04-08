@@ -74,6 +74,51 @@
         </div>
     </div>
 
+    <!-- Document Management Section -->
+    <div class="admin-wrapper" style="padding: 0 20px 40px; max-width: 1200px; margin: 0 auto;">
+        <div class="glass-card" style="padding: 30px; border-radius: 12px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            <header style="margin-bottom: 24px;">
+                <h1 style="font-size: 2rem; color: var(--text-color);">Document Management</h1>
+            </header>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary-color);">
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">ID</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Title</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Author</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Active Version</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Status</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="doc : ${documents}" style="border-bottom: 1px solid rgba(0,0,0,0.1); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.02)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.id}">1</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.title}">Title</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.activeVersion != null ? doc.activeVersion.author.username : '-'}">Author</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.activeVersion != null ? 'v' + doc.activeVersion.versionNumber : '-'}">v1</td>
+                            <td style="padding: 12px;">
+                                <span th:if="${doc.activeVersion != null}"
+                                      th:class="'status-tag '
+                                          + (${doc.activeVersion.status.name() == 'DRAFT'} ? 'status-draft' : '')
+                                          + (${doc.activeVersion.status.name() == 'PENDING_REVIEW'} ? 'status-pending' : '')
+                                          + (${doc.activeVersion.status.name() == 'APPROVED'} ? 'status-approved' : '')
+                                          + (${doc.activeVersion.status.name() == 'REJECTED'} ? 'status-rejected' : '')"
+                                      th:text="${doc.activeVersion.status}">DRAFT</span>
+                                <span th:if="${doc.activeVersion == null}" style="color: #999;">-</span>
+                            </td>
+                            <td style="padding: 12px;">
+                                <a th:href="@{/document/{id}(id=${doc.id})}" class="action-btn approve" style="text-decoration: none; display: inline-block;">View / Manage</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
 </body>

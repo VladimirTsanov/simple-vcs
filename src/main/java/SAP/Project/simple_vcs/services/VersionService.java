@@ -73,23 +73,31 @@ public class VersionService {
             version.setReviewer(requestingUser);
         }
         version.setStatus(newStatus);
-        return versionRepository.save(version);
+        versionRepository.save(version);
+
+        if (newStatus == VersionStatus.APPROVED) {
+            Document document = version.getDocument();
+            document.setActiveVersion(version);
+            documentRepository.save(document);
+        }
+
+        return version;
     }
 
     private void validateTransition(VersionStatus from, VersionStatus to, Version version, User requestingUser)
             throws InvalidStatusTransitionException {
         boolean isAdmin = requestingUser.getRoles().stream()
                 .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
-        boolean isAuthor = version.getAuthor() != null &&
-                version.getAuthor().getId().equals(requestingUser.getId());
         boolean isReviewer = requestingUser.getRoles().stream()
                 .anyMatch(r -> r.getName().equals("ROLE_REVIEWER"));
+        boolean isAuthor = requestingUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_AUTHOR"));
 
         boolean allowed = switch (from) {
-            case DRAFT -> to == VersionStatus.PENDING_REVIEW && (isAuthor || isAdmin);
+            case DRAFT -> to == VersionStatus.PENDING_REVIEW && (isAuthor || isReviewer || isAdmin);
             case PENDING_REVIEW -> (to == VersionStatus.APPROVED || to == VersionStatus.REJECTED)
                     && (isReviewer || isAdmin);
-            case REJECTED -> to == VersionStatus.DRAFT && (isAuthor || isAdmin);
+            case REJECTED -> to == VersionStatus.DRAFT && (isReviewer || isAdmin);
             case APPROVED -> false;
         };
 
