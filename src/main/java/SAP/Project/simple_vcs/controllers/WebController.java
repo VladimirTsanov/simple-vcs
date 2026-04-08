@@ -25,19 +25,17 @@ public class WebController {
             boolean isReviewer = userDetails.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_REVIEWER"));
             if (isAdmin || isReviewer) {
-                model.addAttribute("documents", documentService.getAllDocuments());
+                model.addAttribute("allDocuments", documentService.getAllDocuments());
             } else {
-                java.util.List<SAP.Project.simple_vcs.entity.Document> docs = new java.util.ArrayList<>(
-                        documentService.getPersonalDocuments(userId));
-                documentService.getDocumentsSharedWithUser(userId).forEach(d -> {
-                    if (docs.stream().noneMatch(existing -> existing.getId().equals(d.getId()))) {
-                        docs.add(d);
-                    }
-                });
-                model.addAttribute("documents", docs);
+                java.util.List<SAP.Project.simple_vcs.entity.Document> personal =
+                        new java.util.ArrayList<>(documentService.getPersonalDocuments(userId));
+                java.util.List<SAP.Project.simple_vcs.entity.Document> shared =
+                        documentService.getDocumentsSharedWithUser(userId).stream()
+                                .filter(d -> personal.stream().noneMatch(p -> p.getId().equals(d.getId())))
+                                .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("myDocuments", personal);
+                model.addAttribute("sharedDocuments", shared);
             }
-        } else {
-            model.addAttribute("documents", java.util.Collections.emptyList());
         }
         return "index";
     }
