@@ -8,6 +8,7 @@
     <header th:replace="~{fragments/layout :: navbar}"></header>
 
     <div class="file-page-wrapper">
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
         <div class="glass-card file-details-card">
 
             <header class="file-header">
@@ -62,15 +63,50 @@
                             <td th:text="${#temporals.format(version.createdAt, 'MMM dd, yyyy HH:mm')}">Oct 24, 2026
                             </td>
                             <td>
-                                <span th:class="'status-tag ' + (${version.status.name() == 'DRAFT' ? 'archived' : ''})"
-                                    th:text="${version.status}">Current</span>
+                                <span th:class="'status-tag '
+                                    + (${version.status.name() == 'DRAFT'} ? 'status-draft' : '')
+                                    + (${version.status.name() == 'PENDING_REVIEW'} ? 'status-pending' : '')
+                                    + (${version.status.name() == 'APPROVED'} ? 'status-approved' : '')
+                                    + (${version.status.name() == 'REJECTED'} ? 'status-rejected' : '')"
+                                    th:text="${version.status}">DRAFT</span>
                             </td>
                             <td th:text="${version.author != null ? version.author.username : 'Unknown'}">Author</td>
                             <td>
-                                <!-- TODO: Implement revert logic -->
-                                <button class="action-btn revert">Revert</button>
-                                <!-- TODO: Implement delete logic -->
-                                <button class="action-btn delete">Delete</button>
+                                <!-- Submit for Review: author of this version or admin, only on DRAFT -->
+                                <form th:if="${version.status.name() == 'DRAFT'}"
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="PENDING_REVIEW"/>
+                                    <button type="submit" class="action-btn submit-review">Submit for Review</button>
+                                </form>
+
+                                <!-- Approve: reviewer or admin, only on PENDING_REVIEW -->
+                                <form th:if="${version.status.name() == 'PENDING_REVIEW'}"
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="APPROVED"/>
+                                    <button type="submit" class="action-btn approve">Approve</button>
+                                </form>
+
+                                <!-- Reject: reviewer or admin, only on PENDING_REVIEW -->
+                                <form th:if="${version.status.name() == 'PENDING_REVIEW'}"
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="REJECTED"/>
+                                    <button type="submit" class="action-btn delete">Reject</button>
+                                </form>
+
+                                <!-- Revert to Draft: author or admin, only on REJECTED -->
+                                <form th:if="${version.status.name() == 'REJECTED'}"
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="DRAFT"/>
+                                    <button type="submit" class="action-btn revert">Revert to Draft</button>
+                                </form>
                             </td>
                         </tr>
                     </tbody>

@@ -1096,8 +1096,24 @@ nav ul {
 
 .revert { background: #e3f2fd; color: #1976d2; }
 .delete { background: #ffebee; color: #d32f2f; }
+.submit-review { background: #e8f5e9; color: #2e7d32; }
+.approve { background: #e8f5e9; color: #2e7d32; }
 
 .action-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+
+/* --- STATUS BADGES --- */
+.status-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.status-draft { background: #f3f3f3; color: #666; }
+.status-pending { background: #fff8e1; color: #f57f17; }
+.status-approved { background: #e8f5e9; color: #2e7d32; }
+.status-rejected { background: #ffebee; color: #c62828; }
 
 
 .light-theme .file-details-card {
