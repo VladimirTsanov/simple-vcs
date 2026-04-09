@@ -106,7 +106,7 @@
                                           + (${doc.activeVersion.status.name() == 'PENDING_REVIEW'} ? 'status-pending' : '')
                                           + (${doc.activeVersion.status.name() == 'APPROVED'} ? 'status-approved' : '')
                                           + (${doc.activeVersion.status.name() == 'REJECTED'} ? 'status-rejected' : '')"
-                                      th:text="${doc.activeVersion.status}">DRAFT</span>
+                                      th:text="${#strings.replace(doc.activeVersion.status.name(), '_', ' ')}">DRAFT</span>
                                 <span th:if="${doc.activeVersion == null}" style="color: #999;">-</span>
                             </td>
                             <td style="padding: 12px;">
