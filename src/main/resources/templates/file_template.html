@@ -68,7 +68,7 @@
                                     + (${version.status.name() == 'PENDING_REVIEW'} ? 'status-pending' : '')
                                     + (${version.status.name() == 'APPROVED'} ? 'status-approved' : '')
                                     + (${version.status.name() == 'REJECTED'} ? 'status-rejected' : '')"
-                                    th:text="${version.status}">DRAFT</span>
+                                    th:text="${#strings.replace(version.status.name(), '_', ' ')}">DRAFT</span>
                             </td>
                             <td th:text="${version.author != null ? version.author.username : 'Unknown'}">Author</td>
                             <td>

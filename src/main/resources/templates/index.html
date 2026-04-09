@@ -35,7 +35,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
-                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}"></span></p>
+                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
                         <p class="file-date">Author: <span th:text="${doc.activeVersion != null and doc.activeVersion.author != null ? doc.activeVersion.author.username : 'Unknown'}"></span></p>
                     </div>
                     <div class="card-body">
@@ -70,7 +70,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
-                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}"></span></p>
+                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
                     </div>
                     <div class="card-body">
                         <div class="file-preview">
@@ -99,7 +99,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
-                            <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}"></span></p>
+                            <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
                             <p class="file-date">Author: <span th:text="${doc.activeVersion != null and doc.activeVersion.author != null ? doc.activeVersion.author.username : 'Unknown'}"></span></p>
                         </div>
                         <div class="card-body">
