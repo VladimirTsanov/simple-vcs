@@ -1,6 +1,7 @@
 package SAP.Project.simple_vcs.controllers;
 
 import SAP.Project.simple_vcs.entity.Role;
+import SAP.Project.simple_vcs.services.DocumentService;
 import SAP.Project.simple_vcs.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,13 @@ import org.springframework.ui.Model;
 @RequiredArgsConstructor
 public class AdminController {
     private final UserService userService;
+    private final DocumentService documentService;
 
     @GetMapping("/admin/users")
     public String getAllUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("roles", userService.getAllRoles());
+        model.addAttribute("documents", documentService.getAllDocuments());
         return "admin_dashboard";
     }
 

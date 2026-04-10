@@ -19,9 +19,23 @@ public class WebController {
     @GetMapping("/")
     public String home(Model model, @org.springframework.security.core.annotation.AuthenticationPrincipal SAP.Project.simple_vcs.security.CustomUserDetails userDetails) {
         if (userDetails != null) {
-            model.addAttribute("documents", documentService.getPersonalDocuments(userDetails.getUser().getId()));
-        } else {
-            model.addAttribute("documents", java.util.Collections.emptyList());
+            Long userId = userDetails.getUser().getId();
+            boolean isAdmin = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean isReviewer = userDetails.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_REVIEWER"));
+            if (isAdmin || isReviewer) {
+                model.addAttribute("allDocuments", documentService.getAllDocuments());
+            } else {
+                java.util.List<SAP.Project.simple_vcs.entity.Document> personal =
+                        new java.util.ArrayList<>(documentService.getPersonalDocuments(userId));
+                java.util.List<SAP.Project.simple_vcs.entity.Document> shared =
+                        documentService.getDocumentsSharedWithUser(userId).stream()
+                                .filter(d -> personal.stream().noneMatch(p -> p.getId().equals(d.getId())))
+                                .collect(java.util.stream.Collectors.toList());
+                model.addAttribute("myDocuments", personal);
+                model.addAttribute("sharedDocuments", shared);
+            }
         }
         return "index";
     }

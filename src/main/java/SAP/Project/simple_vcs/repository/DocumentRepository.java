@@ -14,4 +14,5 @@ public interface DocumentRepository extends JpaRepository<Document,Long> {
 
     List<Document> findByActiveVersionAuthorId(Long authorId);
 
+    List<Document> findBySharedWithContaining(User user);
 }

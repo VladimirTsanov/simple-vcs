@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,9 +58,26 @@ public class DocumentService {
     }
 
     @Transactional
-    public void deleteDocument(Long documentId) throws SAP.Project.simple_vcs.exception.DocumentNotFoundException {
+    public void deleteDocument(Long documentId) throws DocumentNotFoundException {
         Document document = getDocumentById(documentId);
         documentRepository.delete(document);
+    }
+
+    @Transactional
+    public Document shareDocument(Long documentId, String emailOrUsername)
+            throws DocumentNotFoundException, UserNotFoundException {
+        Document document = getDocumentById(documentId);
+        User user = userRepository.findByUsername(emailOrUsername)
+                .or(() -> java.util.Optional.ofNullable(userRepository.findByEmail(emailOrUsername)))
+                .orElseThrow(() -> new UserNotFoundException("No user found with username or email: " + emailOrUsername));
+        document.getSharedWith().add(user);
+        return documentRepository.save(document);
+    }
+
+    public List<Document> getDocumentsSharedWithUser(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return new ArrayList<>();
+        return documentRepository.findBySharedWithContaining(user);
     }
 
 }

@@ -63,6 +63,14 @@ public class GlobalExceptionHandler {
         return mav;
     }
 
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public org.springframework.web.servlet.ModelAndView handleInvalidStatusTransition(InvalidStatusTransitionException ex) {
+        org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");
+        mav.addObject("errorCode", "400 Bad Request");
+        mav.addObject("errorMessage", ex.getMessage());
+        return mav;
+    }
+
     @ExceptionHandler(Exception.class)
     public org.springframework.web.servlet.ModelAndView handleAll(Exception ex) {
         org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView("error");

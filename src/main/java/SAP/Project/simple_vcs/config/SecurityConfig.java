@@ -54,8 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/admin/***")
                         .hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers("/new-document","/document/**")
+                        .requestMatchers("/new-document")
                         .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+
+                        .requestMatchers("/document/**")
+                        .authenticated()
                         .anyRequest().authenticated())
 
 
