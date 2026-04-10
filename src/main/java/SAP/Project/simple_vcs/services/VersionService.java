@@ -2,10 +2,6 @@ package SAP.Project.simple_vcs.services;
 
 import java.util.List;
 
-import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
-import SAP.Project.simple_vcs.exception.InvalidStatusTransitionException;
-import SAP.Project.simple_vcs.exception.UserNotFoundException;
-import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +11,9 @@ import SAP.Project.simple_vcs.entity.User;
 import SAP.Project.simple_vcs.entity.Version;
 import SAP.Project.simple_vcs.entity.VersionStatus;
 import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+import SAP.Project.simple_vcs.exception.InvalidStatusTransitionException;
 import SAP.Project.simple_vcs.exception.UserNotFoundException;
+import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import SAP.Project.simple_vcs.repository.VersionRepository;
@@ -37,25 +35,21 @@ public class VersionService {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + authorId +" not found"));
 
-        // Automatically calculate the next version number
         int nextVersionNumber = document.getVersions().size() + 1;
 
         Version newVersion = Version.builder()
                 .document(document)
                 .content(request.content())
                 .versionNumber(nextVersionNumber)
-                .status(VersionStatus.DRAFT) // New versions always start as drafts
+                .status(VersionStatus.DRAFT) 
                 .author(author)
                 .build();
 
-        // Save it FIRST so the database generates an ID for it
         Version savedVersion = versionRepository.save(newVersion);
 
         auditLogService.logActionWithActor(author, "CREATE", "Version", savedVersion.getId(), "Created version " + nextVersionNumber);
 
         return savedVersion;        
-
-        
     }
 
     public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
@@ -83,15 +77,19 @@ public class VersionService {
             version.setReviewer(requestingUser);
         }
         version.setStatus(newStatus);
-        versionRepository.save(version);
+        Version savedVersion = versionRepository.save(version);
 
         if (newStatus == VersionStatus.APPROVED) {
             Document document = version.getDocument();
             document.setActiveVersion(version);
             documentRepository.save(document);
         }
+        
+        // ADDED LOGGING HERE
+        auditLogService.logActionWithActor(requestingUser, "UPDATE_STATUS", "Version", versionId, 
+                "Updated status from " + currentStatus + " to " + newStatus);
 
-        return version;
+        return savedVersion;
     }
 
     private void validateTransition(VersionStatus from, VersionStatus to, Version version, User requestingUser)
@@ -117,4 +115,3 @@ public class VersionService {
         }
     }
 }
-

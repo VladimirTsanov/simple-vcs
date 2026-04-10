@@ -36,7 +36,7 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuditLogService auditLogService; // <-- INJECTED HERE
+    private final AuditLogService auditLogService;
 
     public void registerUser(UserRegistrationDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
@@ -57,7 +57,10 @@ public class UserService implements UserDetailsService {
 
         user.setRoles(new HashSet<>(Collections.singletonList(defaultRole)));
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // ADDED LOGGING HERE (Using logActionWithActor because SecurityContext is empty during Registration)
+        auditLogService.logActionWithActor(savedUser, "REGISTER", "User", savedUser.getId(), "User self-registered: " + dto.getUsername());
     }
 
     public List<Role> getAllRoles() {
@@ -74,7 +77,6 @@ public class UserService implements UserDetailsService {
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Security Check: Prevents an Admin from locking themselves out
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         if (targetUser.getUsername().equals(currentUsername) && !isActive) {
             throw new RuntimeException("Security Risk: You cannot deactivate your own admin account.");
@@ -117,7 +119,12 @@ public class UserService implements UserDetailsService {
         Role role = new Role();
         role.setName(name);
         role.setDescription(description);
-        return roleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
+        
+        // ADDED LOGGING HERE
+        auditLogService.logAction("CREATE", "Role", Long.valueOf(savedRole.getId()), "Created role: " + name);
+        
+        return savedRole;
     }
 
     public void deleteRole(Long roleId) {
@@ -125,6 +132,9 @@ public class UserService implements UserDetailsService {
             throw new RuntimeException("Role not found");
         }
         roleRepository.deleteById(Math.toIntExact(roleId));
+        
+        // ADDED LOGGING HERE
+        auditLogService.logAction("DELETE", "Role", roleId, "Deleted role ID: " + roleId);
     }
 
     private UserResponseDto mapToResponseDto(User user) {
