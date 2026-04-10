@@ -19,24 +19,27 @@ public class AuditLogService {
 
     @Transactional
     public void logAction(String action, String entityType, Long entityId, String details) {
-        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        String principalName = SecurityContextHolder.getContext().getAuthentication().getName();
         
+        // Try finding by email first
+        User actor = userRepository.findByEmail(principalName);
         
-        User actor = userRepository.findByEmail(currentUserEmail);
+        // If not found by email, try finding by username
+        if (actor == null) {
+            actor = userRepository.findByUsername(principalName).orElse(null);
+        }
 
-       
         if (actor != null) {
             AuditLog log = new AuditLog();
             log.setUser(actor);
             log.setAction(action);
             log.setEntityType(entityType);
-            
-            
             log.setEntityId(Math.toIntExact(entityId)); 
-            
             log.setDetails(details);
             
             auditLogRepository.save(log);
+        } else {
+            System.err.println("WARNING: Could not find user '" + principalName + "' to create Audit Log.");
         }
     }
 
