@@ -14,6 +14,8 @@ import SAP.Project.simple_vcs.entity.Document;
 import SAP.Project.simple_vcs.entity.User;
 import SAP.Project.simple_vcs.entity.Version;
 import SAP.Project.simple_vcs.entity.VersionStatus;
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+import SAP.Project.simple_vcs.exception.UserNotFoundException;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import SAP.Project.simple_vcs.repository.VersionRepository;
@@ -25,6 +27,7 @@ public class VersionService {
     private final VersionRepository versionRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public Version createNewVersion(VersionRequest request, Long authorId) throws UserNotFoundException, DocumentNotFoundException {
@@ -45,7 +48,14 @@ public class VersionService {
                 .author(author)
                 .build();
 
-        return versionRepository.save(newVersion);
+        // Save it FIRST so the database generates an ID for it
+        Version savedVersion = versionRepository.save(newVersion);
+
+        auditLogService.logActionWithActor(author, "CREATE", "Version", savedVersion.getId(), "Created version " + nextVersionNumber);
+
+        return savedVersion;        
+
+        
     }
 
     public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
@@ -107,3 +117,4 @@ public class VersionService {
         }
     }
 }
+
