@@ -22,7 +22,6 @@
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Email</th>
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Status</th>
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Roles</th>
-                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,13 +58,7 @@
                                 </form>
                             </td>
 
-                            <td style="padding: 12px;">
-                                <form th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" onsubmit="return confirm('WARNING: Are you sure you want to permanently delete this user?');">
-                                    <button type="submit" style="background: rgba(244, 67, 54, 0.1); border: 1px solid rgba(244, 67, 54, 0.4); color: #c62828; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(244, 67, 54, 0.9)'; this.style.color='white';" onmouseout="this.style.background='rgba(244, 67, 54, 0.1)'; this.style.color='#c62828';">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
+                            
                         </tr>
                     </tbody>
                 </table>
@@ -90,7 +83,6 @@
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Author</th>
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Active Version</th>
                             <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Status</th>
-                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Actions</th>
                         </tr>
                     </thead>
                     <tbody>

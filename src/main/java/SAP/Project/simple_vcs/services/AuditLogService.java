@@ -1,5 +1,7 @@
 package SAP.Project.simple_vcs.services;
 
+import java.util.List;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,5 +55,13 @@ public class AuditLogService {
         log.setDetails(details);
         
         auditLogRepository.save(log);
+    }
+
+
+    public List<AuditLog> getAllAuditLogs() {
+        List<AuditLog> logs = auditLogRepository.findAll();
+        // Sort by ID descending (highest ID = newest log)
+        logs.sort((a, b) -> b.getId().compareTo(a.getId()));
+        return logs;
     }
 }

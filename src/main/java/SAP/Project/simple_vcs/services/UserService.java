@@ -88,15 +88,6 @@ public class UserService implements UserDetailsService {
         auditLogService.logAction("UPDATE_STATUS", "User", userId, "Changed active status to " + isActive);
     }
 
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
-        }
-        userRepository.deleteById(userId);
-
-        auditLogService.logAction("DELETE", "User", userId, "Deleted user permanently");
-    }
-
     public void updateUserRoles(Long userId, Set<String> roleNames) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

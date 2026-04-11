@@ -34,6 +34,7 @@
             <li><a th:href="@{/}" class="nav-btn">Home</a></li>
             <li><a href="#myfooter" class="nav-btn">About us</a></li>
             <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/users}" class="nav-btn">Admin</a></li>
+            <li sec:authorize="hasAuthority('ROLE_ADMIN')"><a th:href="@{/admin/audit-logs}" class="nav-btn">Audit Logs</a></li>
             <li sec:authorize="isAnonymous()"><a th:href="@{/login}" class="nav-btn">Login</a></li>
             <li sec:authorize="isAuthenticated()"><a th:href="@{/logout}" class="nav-btn">Logout</a></li>
         </ul>
