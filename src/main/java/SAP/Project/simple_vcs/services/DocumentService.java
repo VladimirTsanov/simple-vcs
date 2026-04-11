@@ -1,20 +1,22 @@
 package SAP.Project.simple_vcs.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import SAP.Project.simple_vcs.dto.DocumentRequest;
-import SAP.Project.simple_vcs.entity.*;
+import SAP.Project.simple_vcs.entity.Document;
+import SAP.Project.simple_vcs.entity.User;
+import SAP.Project.simple_vcs.entity.Version;
+import SAP.Project.simple_vcs.entity.VersionStatus;
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
 import SAP.Project.simple_vcs.exception.UserNotFoundException;
-import SAP.Project.simple_vcs.repository.*;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import SAP.Project.simple_vcs.repository.VersionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,15 +24,18 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final VersionRepository versionRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService; 
 
     @Transactional
     public Document createDocument(DocumentRequest request, Long authorId) throws UserNotFoundException {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new UserNotFoundException("User with id" + authorId + " not found"));
+        
         Document document = Document.builder()
                 .title(request.title())
                 .build();
         document = documentRepository.save(document);
+        
         Version v1 = Version.builder()
                 .document(document)
                 .content(request.content())
@@ -38,9 +43,15 @@ public class DocumentService {
                 .status(VersionStatus.DRAFT)
                 .author(author)
                 .build();
+                
         document.setActiveVersion(v1);
         document.getVersions().add(v1);
-        return documentRepository.save(document);
+        
+        Document savedDocument = documentRepository.save(document);
+
+        auditLogService.logActionWithActor(author, "CREATE", "Document", savedDocument.getId(), "Created document: " + request.title());
+
+        return savedDocument;
     }
 
     public List<Document> getAllDocuments() {
@@ -61,6 +72,8 @@ public class DocumentService {
     public void deleteDocument(Long documentId) throws DocumentNotFoundException {
         Document document = getDocumentById(documentId);
         documentRepository.delete(document);
+        
+        auditLogService.logAction("DELETE", "Document", documentId, "Deleted document");
     }
 
     @Transactional
@@ -70,8 +83,14 @@ public class DocumentService {
         User user = userRepository.findByUsername(emailOrUsername)
                 .or(() -> java.util.Optional.ofNullable(userRepository.findByEmail(emailOrUsername)))
                 .orElseThrow(() -> new UserNotFoundException("No user found with username or email: " + emailOrUsername));
+        
         document.getSharedWith().add(user);
-        return documentRepository.save(document);
+        Document savedDocument = documentRepository.save(document);
+        
+        // ADDED LOGGING HERE
+        auditLogService.logAction("SHARE", "Document", documentId, "Shared document with: " + emailOrUsername);
+        
+        return savedDocument;
     }
 
     public List<Document> getDocumentsSharedWithUser(Long userId) {
@@ -79,5 +98,4 @@ public class DocumentService {
         if (user == null) return new ArrayList<>();
         return documentRepository.findBySharedWithContaining(user);
     }
-
 }

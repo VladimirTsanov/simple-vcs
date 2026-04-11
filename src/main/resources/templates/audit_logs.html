@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Audit Logs')}"></head>
+
+<body class="light-theme dashboard-body">
+
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+
+    <div class="admin-wrapper" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="glass-card" style="padding: 30px; border-radius: 12px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            
+            <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <h1 style="font-size: 2rem; color: var(--text-color); margin: 0;">System Audit Logs</h1>
+                
+                <!-- Filter Controls -->
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="searchInput" placeholder="Search user or details..." 
+                           style="border-radius: 6px; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.2); outline: none;"
+                           onkeyup="filterLogs()">
+                           
+                    <select id="actionFilter" style="border-radius: 6px; padding: 8px 12px; border: 1px solid rgba(0,0,0,0.2); outline: none;" onchange="filterLogs()">
+                        <option value="ALL">All Actions</option>
+                        <option value="CREATE">Create</option>
+                        <option value="UPDATE">Update</option>
+                        <option value="DELETE">Delete</option>
+                        <option value="SHARE">Share</option>
+                        <option value="REGISTER">Register</option>
+                    </select>
+                </div>
+            </header>
+
+            <div style="overflow-x: auto;">
+                <table id="auditTable" style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary-color);">
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Date & Time</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">User</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Action</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Target</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="log : ${logs}" class="log-row"
+                            style="border-bottom: 1px solid rgba(0,0,0,0.1); transition: background-color 0.2s;" 
+                            onmouseover="this.style.backgroundColor='rgba(0,0,0,0.02)'" 
+                            onmouseout="this.style.backgroundColor='transparent'">
+                            
+                            <!-- Date (Requires thymeleaf-extras-java8time, or just uses basic toString) -->
+                            <td style="padding: 12px; color: var(--text-color); font-size: 0.9rem;" 
+                                th:text="${#temporals.format(log.createdAt, 'MMM dd, yyyy HH:mm')}">Date</td>
+                            
+                            <!-- User -->
+                            <td class="log-user" style="padding: 12px; color: var(--text-color); font-weight: 500;" 
+                                th:text="${log.user != null ? log.user.username : 'System'}">User</td>
+
+                            <!-- Action Badge (Color coded based on action type) -->
+                            <td class="log-action" style="padding: 12px;">
+                                <span class="status-tag" 
+                                      th:text="${log.action}"
+                                      th:style="'padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; ' + 
+                                        (${#strings.contains(log.action, 'CREATE') || #strings.contains(log.action, 'REGISTER')} ? 'background-color: rgba(76, 175, 80, 0.2); color: #2e7d32;' : 
+                                        (${#strings.contains(log.action, 'DELETE')} ? 'background-color: rgba(244, 67, 54, 0.2); color: #c62828;' : 
+                                        'background-color: rgba(255, 152, 0, 0.2); color: #e65100;'))">
+                                    ACTION
+                                </span>
+                            </td>
+
+                            <!-- Entity Info -->
+                            <td style="padding: 12px; color: var(--text-color); font-size: 0.9rem;" 
+                                th:text="${log.entityType + ' (ID: ' + log.entityId + ')'}">Entity</td>
+
+                            <!-- Details (Truncated with a View button if too long) -->
+                            <td class="log-details" style="padding: 12px; color: var(--text-color); max-width: 250px;">
+                                <span th:if="${#strings.length(log.details) <= 40}" th:text="${log.details}">Short Details</span>
+                                
+                                <div th:if="${#strings.length(log.details) > 40}" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span th:text="${#strings.substring(log.details, 0, 37) + '...'}">Long details...</span>
+                                    <!-- Use a native onclick to pass the full string to our JS Modal -->
+                                    <button type="button" class="cta-btn" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: none;"
+                                            th:data-details="${log.details}" onclick="openDetailsModal(this.getAttribute('data-details'))">
+                                        View
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Native HTML5 Dialog for Pop-ups (No extra CSS libraries needed) -->
+    <dialog id="detailsModal" style="border: none; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 24px; max-width: 500px; width: 90%; background: var(--bg-color, #fff);">
+        <h3 style="margin-top: 0; color: var(--text-color);">Full Log Details</h3>
+        <p id="modalText" style="color: var(--text-color); line-height: 1.6; word-wrap: break-word; margin-bottom: 24px;"></p>
+        <div style="text-align: right;">
+            <button class="cta-btn" onclick="document.getElementById('detailsModal').close()" style="padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer;">Close</button>
+        </div>
+    </dialog>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script th:src="@{/js/javascript_index.js}"></script>
+    
+    <!-- Custom JS for Table Filtering and Modal -->
+    <script>
+        // 1. Modal Logic
+        function openDetailsModal(fullText) {
+            document.getElementById('modalText').innerText = fullText;
+            document.getElementById('detailsModal').showModal();
+        }
+
+        // 2. Client-side Search & Filter Logic
+        function filterLogs() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const actionFilter = document.getElementById('actionFilter').value.toUpperCase();
+            
+            const rows = document.querySelectorAll('.log-row');
+            
+            rows.forEach(row => {
+                const userText = row.querySelector('.log-user').innerText.toLowerCase();
+                const detailsText = row.querySelector('.log-details').innerText.toLowerCase();
+                const actionText = row.querySelector('.log-action').innerText.toUpperCase();
+                
+                // Check if row matches search text (either user or details)
+                const matchesSearch = userText.includes(searchInput) || detailsText.includes(searchInput);
+                // Check if row matches dropdown action
+                const matchesAction = actionFilter === 'ALL' || actionText.includes(actionFilter);
+                
+                if (matchesSearch && matchesAction) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

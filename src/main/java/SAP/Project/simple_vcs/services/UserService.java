@@ -1,5 +1,23 @@
 package SAP.Project.simple_vcs.services;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import SAP.Project.simple_vcs.dto.UserRegistrationDto;
 import SAP.Project.simple_vcs.dto.UserResponseDto;
 import SAP.Project.simple_vcs.entity.Role;
@@ -8,37 +26,17 @@ import SAP.Project.simple_vcs.exception.UserAlreadyExistsException;
 import SAP.Project.simple_vcs.repository.RoleRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-
-
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Primary
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     public void registerUser(UserRegistrationDto dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
@@ -59,7 +57,10 @@ public class UserService implements UserDetailsService{
 
         user.setRoles(new HashSet<>(Collections.singletonList(defaultRole)));
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // ADDED LOGGING HERE (Using logActionWithActor because SecurityContext is empty during Registration)
+        auditLogService.logActionWithActor(savedUser, "REGISTER", "User", savedUser.getId(), "User self-registered: " + dto.getUsername());
     }
 
     public List<Role> getAllRoles() {
@@ -76,7 +77,6 @@ public class UserService implements UserDetailsService{
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Security Check: Prevents an Admin from locking themselves out
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         if (targetUser.getUsername().equals(currentUsername) && !isActive) {
             throw new RuntimeException("Security Risk: You cannot deactivate your own admin account.");
@@ -84,13 +84,8 @@ public class UserService implements UserDetailsService{
 
         targetUser.setActive(isActive);
         userRepository.save(targetUser);
-    }
 
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
-        }
-        userRepository.deleteById(userId);
+        auditLogService.logAction("UPDATE_STATUS", "User", userId, "Changed active status to " + isActive);
     }
 
     public void updateUserRoles(Long userId, Set<String> roleNames) {
@@ -104,6 +99,8 @@ public class UserService implements UserDetailsService{
 
         user.setRoles(newRoles);
         userRepository.save(user);
+
+        auditLogService.logAction("UPDATE_ROLES", "User", userId, "Assigned roles: " + roleNames.toString());
     }
 
     public Role createRole(String name, String description) {
@@ -113,7 +110,12 @@ public class UserService implements UserDetailsService{
         Role role = new Role();
         role.setName(name);
         role.setDescription(description);
-        return roleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
+        
+        // ADDED LOGGING HERE
+        auditLogService.logAction("CREATE", "Role", Long.valueOf(savedRole.getId()), "Created role: " + name);
+        
+        return savedRole;
     }
 
     public void deleteRole(Long roleId) {
@@ -121,6 +123,9 @@ public class UserService implements UserDetailsService{
             throw new RuntimeException("Role not found");
         }
         roleRepository.deleteById(Math.toIntExact(roleId));
+        
+        // ADDED LOGGING HERE
+        auditLogService.logAction("DELETE", "Role", roleId, "Deleted role ID: " + roleId);
     }
 
     private UserResponseDto mapToResponseDto(User user) {
@@ -133,13 +138,6 @@ public class UserService implements UserDetailsService{
         return dto;
     }
 
-
-
-
-
-
-
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
@@ -151,15 +149,9 @@ public class UserService implements UserDetailsService{
         return new SAP.Project.simple_vcs.security.CustomUserDetails(user);
     }
 
-
-
-
-
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
     }
-
-
 }
