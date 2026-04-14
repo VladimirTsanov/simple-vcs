@@ -8,7 +8,6 @@ import SAP.Project.simple_vcs.exception.UserNotFoundException;
 import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import SAP.Project.simple_vcs.dto.VersionRequest;
 import SAP.Project.simple_vcs.entity.Document;
 import SAP.Project.simple_vcs.entity.User;
@@ -115,5 +114,19 @@ public class VersionService {
             throw new InvalidStatusTransitionException(
                     "Transition from " + from + " to " + to + " is not allowed for your role.");
         }
+    }
+    public List<Version> getVersionsForDocument(Long documentId, Long userId, boolean isAdmin) throws DocumentNotFoundException {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + documentId + " not found"));
+
+        boolean isOwnerOrContributor = document.getVersions().stream()
+                .anyMatch(v -> v.getAuthor().getId().equals(userId));
+
+        if (!isAdmin && !isOwnerOrContributor) {
+            auditLogService.logAction("UNAUTHORIZED_HISTORY_ACCESS", "Document", documentId, "User ID " + userId + " tried to view history.");
+            throw new AccessDeniedException("You don't have permission to see the document history!");
+        }
+
+        return document.getVersions();
     }
 }

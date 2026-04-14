@@ -10,14 +10,12 @@
 <div class="file-page-wrapper">
 
     <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
-
     <div class="glass-card file-details-card">
 
         <header class="file-header">
             <h1 class="file-title" th:text="${document.title}">Project_Proposal_v2.pdf</h1>
 
             <div style="display: flex; gap: 10px; align-items: center;">
-
                 <a th:if="${document.activeVersion != null and document.activeVersion.status.name() == 'APPROVED'}"
                    th:href="@{/document/{id}/export/pdf(id=${document.id})}"
                    class="action-btn revert"
@@ -49,7 +47,9 @@
             <div class="file-description">
                 <h3>Current Content</h3>
                 <p th:text="${document.activeVersion != null ? document.activeVersion.content : 'No active content available'}">
-                    Document content goes here...
+                    This file contains the updated workspace management proposal for the 2026 Q3 roadmap. It
+                    includes budget allocations, team structures, and the final design mockups for the ITEAC
+                    dashboard.
                 </p>
             </div>
         </div>
@@ -121,7 +121,7 @@
                               method="post" style="display:inline;"
                               sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
                             <input type="hidden" name="newStatus" value="PENDING_REVIEW"/>
-                            <button type="submit" class="action-btn submit-review">Review</button>
+                            <button type="submit" class="action-btn submit-review">Submit for Review</button>
                         </form>
 
                         <form th:if="${version.status.name() == 'PENDING_REVIEW'}"
@@ -139,6 +139,14 @@
                             <input type="hidden" name="newStatus" value="REJECTED"/>
                             <button type="submit" class="action-btn delete">Reject</button>
                         </form>
+
+                        <form th:if="${version.status.name() == 'REJECTED'}"
+                              th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                              method="post" style="display:inline;"
+                              sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                            <input type="hidden" name="newStatus" value="DRAFT"/>
+                            <button type="submit" class="action-btn revert">Revert to Draft</button>
+                        </form>
                     </td>
                 </tr>
                 </tbody>
@@ -146,19 +154,28 @@
         </div>
 
 
-        <div style="margin-top: 30px; display: flex; gap: 10px;">
-            <button class="cta-btn" onclick="openNewVersionModal()" sec:authorize="isAuthenticated()">+ New Version</button>
-            <button class="action-btn submit-review" onclick="openShareModal()" sec:authorize="isAuthenticated()">Share Document</button>
+        <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')" style="margin-top: 30px; display: flex; gap: 10px;">
+            <button class="action-btn approve" onclick="openNewVersionModal()">+ New Version</button>
+            <button class="action-btn submit-review" onclick="openShareModal()">Share Document</button>
+            <div th:if="${document.sharedWith != null and !document.sharedWith.empty}" style="margin-top: 10px; font-size: 0.88rem; color: #555;">
+                Shared with:
+                <span th:each="u, iter : ${document.sharedWith}">
+                        <strong th:text="${u.username}"></strong><span th:if="${!iter.last}">, </span>
+                    </span>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="shareModal" class="modal-backdrop" style="display:none;">
-    <div class="modal-content">
-        <h2>Share Document</h2>
+<div id="shareModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:440px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
+        <button onclick="closeShareModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
+        <h2 style="margin:0 0 8px; font-size:1.4rem;">Share Document</h2>
+        <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Enter the username or email of the user to share with.</p>
         <form th:action="@{/document/{id}/share(id=${document.id})}" method="post">
-            <input type="text" name="emailOrUsername" placeholder="Username or email" required class="nav-btn" style="width:100%; margin: 15px 0;"/>
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <input type="text" name="emailOrUsername" placeholder="Username or email"
+                   style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; box-sizing:border-box;" required/>
+            <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                 <button type="button" onclick="closeShareModal()" class="action-btn revert">Cancel</button>
                 <button type="submit" class="action-btn approve">Share</button>
             </div>
@@ -166,15 +183,18 @@
     </div>
 </div>
 
-<div id="newVersionModal" class="modal-backdrop" style="display:none;">
-    <div class="modal-content" style="max-width: 700px;">
-        <h2>Create New Version</h2>
+<div id="newVersionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:680px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
+        <button onclick="closeNewVersionModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
+        <h2 style="margin:0 0 8px; font-size:1.4rem;">New Version</h2>
+        <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Edit the content below — it starts from the current active version.</p>
         <form th:action="@{/document/{id}/version/new(id=${document.id})}" method="post">
-                <textarea name="content" rows="12" th:text="${document.activeVersion != null ? document.activeVersion.content : ''}"
-                          style="width:100%; margin: 15px 0; padding: 10px; border-radius: 8px; font-family: monospace;"></textarea>
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <textarea name="content" rows="12"
+                          th:text="${document.activeVersion != null ? document.activeVersion.content : ''}"
+                          style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+            <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                 <button type="button" onclick="closeNewVersionModal()" class="action-btn revert">Cancel</button>
-                <button type="submit" class="action-btn approve">Save Changes</button>
+                <button type="submit" class="action-btn approve">Create Version</button>
             </div>
         </form>
     </div>

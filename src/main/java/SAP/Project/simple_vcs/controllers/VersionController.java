@@ -7,6 +7,7 @@ import SAP.Project.simple_vcs.exception.AccessDeniedException;
 import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
 import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import SAP.Project.simple_vcs.security.CustomUserDetails;
+import SAP.Project.simple_vcs.services.AuditLogService;
 import SAP.Project.simple_vcs.services.VersionDiffService;
 import SAP.Project.simple_vcs.services.VersionService;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +24,7 @@ public class VersionController {
 
     private final VersionService versionService;
     private final VersionDiffService diffService;
-
-    // Пълна история на документа (за вашата задача)
-   /* @GetMapping("/document/{id}/history")
-    public ResponseEntity<List<VersionResponse>> getHistory(@PathVariable Long id) throws DocumentNotFoundException {
-        List<VersionResponse> response = versionService.getVersionsForDocument(id).stream()
-                .map(v -> new VersionResponse(
-                        v.getId(),
-                        v.getVersionNumber(),
-                        v.getContent(),
-                        v.getStatus().name(),
-                        v.getAuthor().getId()
-                ))
-                .toList();
-        return ResponseEntity.ok(response);
-    }*/
+    private final AuditLogService auditLogService;
 
     @GetMapping("/document/{id}/history")
     public ResponseEntity<List<VersionResponse>> getHistory(
@@ -70,6 +57,9 @@ public class VersionController {
     @GetMapping("/compare/{oldId}/{newId}")
     public ResponseEntity<List<DiffResponse>> compare(@PathVariable Long oldId, @PathVariable Long newId)
             throws VersionNotFoundException {
+
+        auditLogService.logAction("COMPARE_VERSIONS", "Version", oldId, "Compared with " + newId);
+
         return ResponseEntity.ok(diffService.compareVersions(oldId, newId));
     }
 }
