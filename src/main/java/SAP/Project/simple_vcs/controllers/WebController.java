@@ -63,6 +63,11 @@ public class WebController {
         return "document_creation";
     }
 
+    @GetMapping("/compare-versions")
+    public String showComparisonPage() {
+        return "comparison"; // името на новия HTML файл
+    }
+
 
 
 

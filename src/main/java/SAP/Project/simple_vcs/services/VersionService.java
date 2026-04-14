@@ -2,18 +2,18 @@ package SAP.Project.simple_vcs.services;
 
 import java.util.List;
 
+import SAP.Project.simple_vcs.exception.AccessDeniedException;
+import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
+import SAP.Project.simple_vcs.exception.UserNotFoundException;
+import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import SAP.Project.simple_vcs.dto.VersionRequest;
 import SAP.Project.simple_vcs.entity.Document;
 import SAP.Project.simple_vcs.entity.User;
 import SAP.Project.simple_vcs.entity.Version;
 import SAP.Project.simple_vcs.entity.VersionStatus;
-import SAP.Project.simple_vcs.exception.DocumentNotFoundException;
 import SAP.Project.simple_vcs.exception.InvalidStatusTransitionException;
-import SAP.Project.simple_vcs.exception.UserNotFoundException;
-import SAP.Project.simple_vcs.exception.VersionNotFoundException;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import SAP.Project.simple_vcs.repository.VersionRepository;
@@ -35,13 +35,14 @@ public class VersionService {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + authorId +" not found"));
 
+        // Automatically calculate the next version number
         int nextVersionNumber = document.getVersions().size() + 1;
 
         Version newVersion = Version.builder()
                 .document(document)
                 .content(request.content())
                 .versionNumber(nextVersionNumber)
-                .status(VersionStatus.DRAFT) 
+                .status(VersionStatus.DRAFT)
                 .author(author)
                 .build();
 
@@ -49,7 +50,7 @@ public class VersionService {
 
         auditLogService.logActionWithActor(author, "CREATE", "Version", savedVersion.getId(), "Created version " + nextVersionNumber);
 
-        return savedVersion;        
+        return savedVersion;
     }
 
     public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
@@ -84,9 +85,9 @@ public class VersionService {
             document.setActiveVersion(version);
             documentRepository.save(document);
         }
-        
+
         // ADDED LOGGING HERE
-        auditLogService.logActionWithActor(requestingUser, "UPDATE_STATUS", "Version", versionId, 
+        auditLogService.logActionWithActor(requestingUser, "UPDATE_STATUS", "Version", versionId,
                 "Updated status from " + currentStatus + " to " + newStatus);
 
         return savedVersion;
@@ -113,5 +114,19 @@ public class VersionService {
             throw new InvalidStatusTransitionException(
                     "Transition from " + from + " to " + to + " is not allowed for your role.");
         }
+    }
+    public List<Version> getVersionsForDocument(Long documentId, Long userId, boolean isAdmin) throws DocumentNotFoundException {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + documentId + " not found"));
+
+        boolean isOwnerOrContributor = document.getVersions().stream()
+                .anyMatch(v -> v.getAuthor().getId().equals(userId));
+
+        if (!isAdmin && !isOwnerOrContributor) {
+            auditLogService.logAction("UNAUTHORIZED_HISTORY_ACCESS", "Document", documentId, "User ID " + userId + " tried to view history.");
+            throw new AccessDeniedException("You don't have permission to see the document history!");
+        }
+
+        return document.getVersions();
     }
 }
