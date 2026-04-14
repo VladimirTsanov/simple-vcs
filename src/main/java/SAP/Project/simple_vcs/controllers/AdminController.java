@@ -1,51 +1,65 @@
 package SAP.Project.simple_vcs.controllers;
 
-import SAP.Project.simple_vcs.entity.Role;
-import SAP.Project.simple_vcs.services.UserService;
-import SAP.Project.simple_vcs.dto.UserResponseDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.Set;
 
-@RestController
-@RequestMapping("/api/admin")
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import SAP.Project.simple_vcs.entity.Role;
+import SAP.Project.simple_vcs.services.AuditLogService; // <-- Added Import
+import SAP.Project.simple_vcs.services.DocumentService;
+import SAP.Project.simple_vcs.services.UserService;
+import lombok.RequiredArgsConstructor;
+
+@Controller
 @RequiredArgsConstructor
 public class AdminController {
+    
     private final UserService userService;
+    private final DocumentService documentService;
+    private final AuditLogService auditLogService; // <-- Injected AuditLogService
 
-    @GetMapping("/users")
-    public List<UserResponseDto> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/admin/users")
+    public String getAllUsers(Model model) {
+        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("roles", userService.getAllRoles());
+        model.addAttribute("documents", documentService.getAllDocuments());
+        return "admin_dashboard";
     }
 
-    @PatchMapping("/users/{userId}/status")
-    public ResponseEntity<String> setUserStatus(@PathVariable Long userId, @RequestParam boolean active) {
+    @PostMapping("/admin/users/{userId}/status")
+    public String setUserStatus(@PathVariable Long userId, @RequestParam boolean active) {
         userService.setUserStatus(userId, active);
-        return ResponseEntity.ok("User status updated successfully");
+        return "redirect:/admin/users";
     }
 
-    @DeleteMapping("/users/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.ok("User deleted successfully");
-    }
-
-    @PutMapping("/users/{userId}/roles")
-    public ResponseEntity<String> updateUserRoles(@PathVariable Long userId, @RequestBody Set<String> roleNames) {
+    @PostMapping("/admin/users/{userId}/roles")
+    public String updateUserRoles(@PathVariable Long userId, @RequestParam Set<String> roleNames) {
         userService.updateUserRoles(userId, roleNames);
-        return ResponseEntity.ok("Roles updated successfully");
+        return "redirect:/admin/users";
     }
 
-    @PostMapping("/roles")
+    @PostMapping("/admin/roles")
     public ResponseEntity<Role> createRole(@RequestParam String name, @RequestParam String description) {
         return ResponseEntity.ok(userService.createRole(name, description));
     }
-    @DeleteMapping("/roles/{roleId}")
+    
+    @DeleteMapping("/admin/roles/{roleId}")
     public ResponseEntity<String> deleteRole(@PathVariable Long roleId) {
         userService.deleteRole(roleId);
         return ResponseEntity.ok("Role deleted successfully");
+    }
+
+    
+    @GetMapping("/admin/audit-logs")
+    public String viewAuditLogs(Model model) {
+        model.addAttribute("logs", auditLogService.getAllAuditLogs());
+        return "audit_logs"; 
     }
 }

@@ -21,38 +21,108 @@
 </section>
 
 
-<section class="discovery" sec:authorize="isAuthenticated()" >
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Your files:</h2>
-        <a th:href="@{/new-document}" class="cta-btn" style="text-decoration: none;">+ New Document</a>
-    </div>
+<section class="discovery" sec:authorize="isAuthenticated()">
 
-    <div class="card-container">
-
-        <a th:each="doc : ${documents}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
-                    <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? doc.activeVersion.status : 'No Version'}">Status</span></p>
-                </div>
-                <div class="card-body">
-                    <div class="file-preview">
-                        <div class="file-icon-placeholder">DOC</div>
+    <!-- Admin / Reviewer: all documents in one list with author -->
+    <div th:if="${allDocuments != null}">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>All Documents</h2>
+            <a th:href="@{/new-document}" class="cta-btn" style="text-decoration: none;"
+               sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_ADMIN')">+ New Document</a>
+        </div>
+        <div class="card-container">
+            <a th:each="doc : ${allDocuments}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
+                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
+                        <p class="file-date">Author: <span th:text="${doc.activeVersion != null and doc.activeVersion.author != null ? doc.activeVersion.author.username : 'Unknown'}"></span></p>
                     </div>
-                    <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
+                    <div class="card-body">
+                        <div class="file-preview">
+                            <div class="file-icon-placeholder">DOC</div>
+                        </div>
+                        <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
+                    </div>
+                    <div class="card-footer">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="12" cy="12" r="3"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-            </div>
-        </a>
-
+            </a>
+            <p th:if="${#lists.isEmpty(allDocuments)}" style="color:#888;">No documents found.</p>
+        </div>
     </div>
+
+    <!-- Author / Reader: My Documents -->
+    <div th:if="${myDocuments != null}">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>My Documents</h2>
+            <a th:href="@{/new-document}" class="cta-btn" style="text-decoration: none;"
+               sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_ADMIN')">+ New Document</a>
+        </div>
+        <div class="card-container">
+            <a th:each="doc : ${myDocuments}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
+                        <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
+                    </div>
+                    <div class="card-body">
+                        <div class="file-preview">
+                            <div class="file-icon-placeholder">DOC</div>
+                        </div>
+                        <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
+                    </div>
+                    <div class="card-footer">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+            <p th:if="${#lists.isEmpty(myDocuments)}" style="color:#888;">You have no documents yet.</p>
+        </div>
+
+        <!-- Shared with Me -->
+        <div style="margin-top: 40px;">
+            <h2 style="margin-bottom: 20px;">Shared with Me</h2>
+            <div class="card-container">
+                <a th:each="doc : ${sharedDocuments}" th:href="@{/document/{id}(id=${doc.id})}" class="file-link">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="file-title" th:text="${doc.title}">Doc Title</h3>
+                            <p class="file-date">Status: <span th:text="${doc.activeVersion != null ? #strings.replace(doc.activeVersion.status.name(), '_', ' ') : 'No Version'}"></span></p>
+                            <p class="file-date">Author: <span th:text="${doc.activeVersion != null and doc.activeVersion.author != null ? doc.activeVersion.author.username : 'Unknown'}"></span></p>
+                        </div>
+                        <div class="card-body">
+                            <div class="file-preview">
+                                <div class="file-icon-placeholder">DOC</div>
+                            </div>
+                            <p class="file-desc" th:text="${doc.activeVersion != null ? doc.activeVersion.content : ''}"></p>
+                        </div>
+                        <div class="card-footer">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="3"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+                <p th:if="${#lists.isEmpty(sharedDocuments)}" style="color:#888;">No documents have been shared with you.</p>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 

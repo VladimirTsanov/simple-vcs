@@ -14,6 +14,7 @@ import SAP.Project.simple_vcs.entity.Document;
 import SAP.Project.simple_vcs.entity.User;
 import SAP.Project.simple_vcs.entity.Version;
 import SAP.Project.simple_vcs.entity.VersionStatus;
+import SAP.Project.simple_vcs.exception.InvalidStatusTransitionException;
 import SAP.Project.simple_vcs.repository.DocumentRepository;
 import SAP.Project.simple_vcs.repository.UserRepository;
 import SAP.Project.simple_vcs.repository.VersionRepository;
@@ -25,6 +26,7 @@ public class VersionService {
     private final VersionRepository versionRepository;
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional
     public Version createNewVersion(VersionRequest request, Long authorId) throws UserNotFoundException, DocumentNotFoundException {
@@ -41,32 +43,77 @@ public class VersionService {
                 .document(document)
                 .content(request.content())
                 .versionNumber(nextVersionNumber)
-                .status(VersionStatus.DRAFT) // New versions always start as drafts
+                .status(VersionStatus.DRAFT)
                 .author(author)
                 .build();
 
-        return versionRepository.save(newVersion);
+        Version savedVersion = versionRepository.save(newVersion);
+
+        auditLogService.logActionWithActor(author, "CREATE", "Version", savedVersion.getId(), "Created version " + nextVersionNumber);
+
+        return savedVersion;
     }
 
-   /* public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
+    public List<Version> getVersionsForDocument(Long documentId) throws DocumentNotFoundException {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id" + documentId + " not found"));
         return document.getVersions();
-    }*/
+    }
 
-    @Transactional(readOnly = true)
-    public List<Version> getVersionsForDocument(Long documentId, Long userId, boolean isAdmin)
-            throws DocumentNotFoundException, AccessDeniedException {
+    public Version getVersionById(Long versionId) throws VersionNotFoundException {
+        return versionRepository.findById(versionId)
+                .orElseThrow(() -> new VersionNotFoundException("Version with id " + versionId + " not found"));
+    }
 
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + documentId + " not found"));
+    @Transactional
+    public Version updateVersionStatus(Long versionId, VersionStatus newStatus, Long requestingUserId)
+            throws VersionNotFoundException, UserNotFoundException, InvalidStatusTransitionException {
+        Version version = getVersionById(versionId);
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + requestingUserId + " not found"));
 
-        // Проверка за сигурност: Ако не си админ, трябва да си автор на текущата версия
-        // (Тъй като в Document няма поле owner, ползваме автора на активната версия за проверка)
-        if (!isAdmin && !document.getActiveVersion().getAuthor().getId().equals(userId)) {
-            throw new AccessDeniedException("Нямате право да виждате историята на този документ!");
+        VersionStatus currentStatus = version.getStatus();
+        validateTransition(currentStatus, newStatus, version, requestingUser);
+
+        if (newStatus == VersionStatus.APPROVED || newStatus == VersionStatus.REJECTED) {
+            version.setReviewer(requestingUser);
+        }
+        version.setStatus(newStatus);
+        Version savedVersion = versionRepository.save(version);
+
+        if (newStatus == VersionStatus.APPROVED) {
+            Document document = version.getDocument();
+            document.setActiveVersion(version);
+            documentRepository.save(document);
         }
 
-        return versionRepository.findByDocumentIdOrderByVersionNumberDesc(documentId);
+        // ADDED LOGGING HERE
+        auditLogService.logActionWithActor(requestingUser, "UPDATE_STATUS", "Version", versionId,
+                "Updated status from " + currentStatus + " to " + newStatus);
+
+        return savedVersion;
+    }
+
+    private void validateTransition(VersionStatus from, VersionStatus to, Version version, User requestingUser)
+            throws InvalidStatusTransitionException {
+        boolean isAdmin = requestingUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_ADMIN"));
+        boolean isReviewer = requestingUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_REVIEWER"));
+        boolean isAuthor = requestingUser.getRoles().stream()
+                .anyMatch(r -> r.getName().equals("ROLE_AUTHOR"));
+
+        boolean allowed = switch (from) {
+            case DRAFT -> to == VersionStatus.PENDING_REVIEW && (isAuthor || isReviewer || isAdmin);
+            case PENDING_REVIEW -> (to == VersionStatus.APPROVED || to == VersionStatus.REJECTED)
+                    && (isReviewer || isAdmin);
+            case REJECTED -> to == VersionStatus.DRAFT && (isReviewer || isAdmin);
+            case APPROVED -> false;
+        };
+
+        if (!allowed) {
+            throw new InvalidStatusTransitionException(
+                    "Transition from " + from + " to " + to + " is not allowed for your role.");
+        }
     }
 }

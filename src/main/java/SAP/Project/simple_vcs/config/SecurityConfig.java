@@ -51,11 +51,14 @@ public class SecurityConfig {
                         .permitAll()
 
 
-                        .requestMatchers("/admin")
+                        .requestMatchers("/admin/***")
                         .hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers("/new-document","/document/**")
+                        .requestMatchers("/new-document")
                         .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
+
+                        .requestMatchers("/document/**")
+                        .authenticated()
                         .anyRequest().authenticated())
 
 
@@ -68,7 +71,15 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler((request, response, authentication) -> {
+                            boolean isAdmin = authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                            if (isAdmin) {
+                                response.sendRedirect("/admin/users");
+                            } else {
+                                response.sendRedirect("/");
+                            }
+                        })
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

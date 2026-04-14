@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Admin Dashboard')}"></head>
+
+<body class="light-theme dashboard-body">
+
+    <header th:replace="~{fragments/layout :: navbar}"></header>
+
+    <div class="admin-wrapper" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="glass-card" style="padding: 30px; border-radius: 12px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="font-size: 2rem; color: var(--text-color);">User Management Dashboard</h1>
+            </header>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary-color);">
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">ID</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Username</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Email</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Status</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Roles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}" style="border-bottom: 1px solid rgba(0,0,0,0.1); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.02)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${user.id}">1</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${user.username}">user</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${user.email}">user@test.com</td>
+
+                            <td style="padding: 12px;">
+                                <form th:action="@{/admin/users/{id}/status(id=${user.id})}" method="post" style="display: flex; gap: 8px; align-items: center;">
+                                    <span th:class="${user.active} ? 'status-tag active' : 'status-tag archived'" 
+                                          th:text="${user.active} ? 'Active' : 'Suspended'"
+                                          th:style="'padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; ' + 
+                                                 (${user.active} ? 'background-color: rgba(76, 175, 80, 0.2); color: #2e7d32;' : 'background-color: rgba(244, 67, 54, 0.2); color: #c62828;')">Active</span>
+                                    <input type="hidden" name="active" th:value="${!user.active}">
+                                    <button type="submit" class="cta-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
+                                        Toggle
+                                    </button>
+                                </form>
+                            </td>
+
+                            <td style="padding: 12px;">
+                                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post" style="display: flex; gap: 8px; align-items: center;">
+                                    <select name="roleNames" multiple style="border-radius: 4px; padding: 4px; border: 1px solid rgba(0,0,0,0.2); min-height: 60px;">
+                                        <option th:each="r : ${roles}" 
+                                                th:value="${r.name}" 
+                                                th:text="${r.name}" 
+                                                th:selected="${user.roles.contains(r.name)}">
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="cta-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
+                                        Update
+                                    </button>
+                                </form>
+                            </td>
+
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Document Management Section -->
+    <div class="admin-wrapper" style="padding: 0 20px 40px; max-width: 1200px; margin: 0 auto;">
+        <div class="glass-card" style="padding: 30px; border-radius: 12px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+            <header style="margin-bottom: 24px;">
+                <h1 style="font-size: 2rem; color: var(--text-color);">Document Management</h1>
+            </header>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--primary-color);">
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">ID</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Title</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Author</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Active Version</th>
+                            <th style="padding: 12px; font-weight: bold; color: var(--text-color);">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="doc : ${documents}" style="border-bottom: 1px solid rgba(0,0,0,0.1); transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.02)'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.id}">1</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.title}">Title</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.activeVersion != null ? doc.activeVersion.author.username : '-'}">Author</td>
+                            <td style="padding: 12px; color: var(--text-color);" th:text="${doc.activeVersion != null ? 'v' + doc.activeVersion.versionNumber : '-'}">v1</td>
+                            <td style="padding: 12px;">
+                                <span th:if="${doc.activeVersion != null}"
+                                      th:class="'status-tag '
+                                          + (${doc.activeVersion.status.name() == 'DRAFT'} ? 'status-draft' : '')
+                                          + (${doc.activeVersion.status.name() == 'PENDING_REVIEW'} ? 'status-pending' : '')
+                                          + (${doc.activeVersion.status.name() == 'APPROVED'} ? 'status-approved' : '')
+                                          + (${doc.activeVersion.status.name() == 'REJECTED'} ? 'status-rejected' : '')"
+                                      th:text="${#strings.replace(doc.activeVersion.status.name(), '_', ' ')}">DRAFT</span>
+                                <span th:if="${doc.activeVersion == null}" style="color: #999;">-</span>
+                            </td>
+                            <td style="padding: 12px;">
+                                <a th:href="@{/document/{id}(id=${doc.id})}" class="action-btn approve" style="text-decoration: none; display: inline-block;">View / Manage</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+
+<script th:src="@{/js/javascript_index.js}"></script>
+
+</html>
