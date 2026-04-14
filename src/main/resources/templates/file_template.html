@@ -57,7 +57,9 @@
         <div class="section-divider"></div>
 
 
-        <div class="comparison-section" style="margin-bottom: 30px; padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+        <div class="comparison-section"
+             sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')"
+             style="margin-bottom: 30px; padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
             <h3 style="margin-bottom: 15px;">Compare Two Versions</h3>
             <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
                 <div class="input-group" style="margin-bottom: 0;">
@@ -89,7 +91,8 @@
         <div class="section-divider"></div>
 
 
-        <div class="file-versions-block">
+        <div class="file-versions-block"
+             sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
             <h3>Version History</h3>
             <table class="version-table">
                 <thead>

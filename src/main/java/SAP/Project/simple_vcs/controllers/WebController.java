@@ -1,12 +1,13 @@
 package SAP.Project.simple_vcs.controllers;
 
 import SAP.Project.simple_vcs.dto.UserRegistrationDto;
+import SAP.Project.simple_vcs.entity.Document;
 import SAP.Project.simple_vcs.entity.User;
+import SAP.Project.simple_vcs.entity.VersionStatus;
 import SAP.Project.simple_vcs.services.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import org.springframework.ui.Model;
 
@@ -27,17 +28,37 @@ public class WebController {
             if (isAdmin || isReviewer) {
                 model.addAttribute("allDocuments", documentService.getAllDocuments());
             } else {
-                java.util.List<SAP.Project.simple_vcs.entity.Document> personal =
+                boolean isAuthor = userDetails.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_AUTHOR"));
+                boolean isReaderOnly = !isAuthor && userDetails.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+
+                java.util.List<Document> personal =
                         new java.util.ArrayList<>(documentService.getPersonalDocuments(userId));
-                java.util.List<SAP.Project.simple_vcs.entity.Document> shared =
+                java.util.List<Document> shared =
                         documentService.getDocumentsSharedWithUser(userId).stream()
                                 .filter(d -> personal.stream().noneMatch(p -> p.getId().equals(d.getId())))
                                 .collect(java.util.stream.Collectors.toList());
-                model.addAttribute("myDocuments", personal);
-                model.addAttribute("sharedDocuments", shared);
+
+                if (isReaderOnly) {
+                    model.addAttribute("myDocuments", personal.stream()
+                            .filter(WebController::hasApprovedActive)
+                            .collect(java.util.stream.Collectors.toList()));
+                    model.addAttribute("sharedDocuments", shared.stream()
+                            .filter(WebController::hasApprovedActive)
+                            .collect(java.util.stream.Collectors.toList()));
+                } else {
+                    model.addAttribute("myDocuments", personal);
+                    model.addAttribute("sharedDocuments", shared);
+                }
             }
         }
         return "index";
+    }
+
+    private static boolean hasApprovedActive(Document d) {
+        return d.getActiveVersion() != null
+                && d.getActiveVersion().getStatus() == VersionStatus.APPROVED;
     }
 
     @GetMapping("/login")
@@ -67,10 +88,6 @@ public class WebController {
     public String showComparisonPage() {
         return "comparison"; // името на новия HTML файл
     }
-
-
-
-
 
 
 
