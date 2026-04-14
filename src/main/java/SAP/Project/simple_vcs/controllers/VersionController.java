@@ -1,6 +1,7 @@
 package SAP.Project.simple_vcs.controllers;
 
 import SAP.Project.simple_vcs.dto.DiffResponse;
+import SAP.Project.simple_vcs.dto.VersionCompareRequest;
 import SAP.Project.simple_vcs.dto.VersionResponse;
 import SAP.Project.simple_vcs.entity.Version;
 import SAP.Project.simple_vcs.exception.AccessDeniedException;
@@ -18,7 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/versions")
+@RequestMapping("/versions")
 @RequiredArgsConstructor
 public class VersionController {
 
@@ -39,7 +40,7 @@ public class VersionController {
         // 2. Викаме сигурния метод в сървиса
         List<Version> versions = versionService.getVersionsForDocument(id, userId, isAdmin);
 
-        // 3. ПРЕВРЪЩАМЕ ЕНТИТИТАТА В DTO (Това оправя червения текст накрая)
+        // 3. ПРЕВРЪЩАМЕ ЕНТИТИТАТА В DTO
         List<VersionResponse> response = versions.stream()
                 .map(v -> new VersionResponse(
                         v.getId(),
@@ -53,13 +54,10 @@ public class VersionController {
         return ResponseEntity.ok(response);
     }
 
-    // Сравнение на две версии (бонус задачата)
-    @GetMapping("/compare/{oldId}/{newId}")
-    public ResponseEntity<List<DiffResponse>> compare(@PathVariable Long oldId, @PathVariable Long newId)
-            throws VersionNotFoundException {
+    @PostMapping("/compare")
+    public ResponseEntity<List<DiffResponse>> compare(
+            @RequestBody VersionCompareRequest request) throws VersionNotFoundException {
 
-        auditLogService.logAction("COMPARE_VERSIONS", "Version", oldId, "Compared with " + newId);
-
-        return ResponseEntity.ok(diffService.compareVersions(oldId, newId));
+        return ResponseEntity.ok(diffService.compareVersions(request.oldVersionId(), request.newVersionId()));
     }
 }

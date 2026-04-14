@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/***")
                         .hasAuthority("ROLE_ADMIN")
 
-                        .requestMatchers("/new-document")
+                        .requestMatchers("/new-document", "/versions/**")
                         .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")
 
                         .requestMatchers("/document/**")
