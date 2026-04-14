@@ -13,6 +13,7 @@ import SAP.Project.simple_vcs.security.CustomUserDetails;
 import SAP.Project.simple_vcs.services.DocumentService;
 import SAP.Project.simple_vcs.services.VersionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -43,10 +44,43 @@ public class DocumentWebController {
     }
 
     @GetMapping("/document/{id}")
-    public String viewDocument(@PathVariable Long id, Model model) throws DocumentNotFoundException {
+    public String viewDocument(@PathVariable Long id, Model model,
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws DocumentNotFoundException {
         Document document = documentService.getDocumentById(id);
+
+        if (isReaderOnly(userDetails)) {
+            boolean hasApprovedActive = document.getActiveVersion() != null
+                    && document.getActiveVersion().getStatus() == VersionStatus.APPROVED;
+            if (!hasApprovedActive) {
+                throw new AccessDeniedException("Readers cannot view documents without an approved version.");
+            }
+            Long userId = userDetails.getUser().getId();
+            boolean authoredByUser = document.getActiveVersion().getAuthor() != null
+                    && userId.equals(document.getActiveVersion().getAuthor().getId());
+            boolean sharedWithUser = document.getSharedWith() != null
+                    && document.getSharedWith().stream()
+                            .anyMatch(u -> userId.equals(u.getId()));
+            if (!authoredByUser && !sharedWithUser) {
+                throw new AccessDeniedException("You don't have access to this document.");
+            }
+        }
+
         model.addAttribute("document", document);
         return "file_template";
+    }
+
+    private static boolean isReaderOnly(CustomUserDetails userDetails) {
+        if (userDetails == null) return false;
+        boolean hasReader = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+        boolean hasPrivileged = userDetails.getAuthorities().stream()
+                .anyMatch(a -> {
+                    String name = a.getAuthority();
+                    return name.equals("ROLE_AUTHOR")
+                            || name.equals("ROLE_REVIEWER")
+                            || name.equals("ROLE_ADMIN");
+                });
+        return hasReader && !hasPrivileged;
     }
 
     @PostMapping("/document/{id}/version/new")
