@@ -974,7 +974,7 @@ nav ul {
   text-align: right;
   padding-right: 10px;
   color: rgba(27, 31, 35, 0.3);
-  user-select: none; /* За да не се маркират номерата при копиране */
+  user-select: none;
   background-color: #fafbfc;
   border-right: 1px solid #eee;
 }
@@ -985,7 +985,7 @@ nav ul {
   flex-grow: 1;
 }
 
-/* Цветове за редовете */
+
 .row-insert { background-color: #e6ffec; }
 .row-insert .diff-num { background-color: #cdffd8; color: #22863a; }
 

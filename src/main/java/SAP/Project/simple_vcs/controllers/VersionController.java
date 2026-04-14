@@ -58,6 +58,13 @@ public class VersionController {
     public ResponseEntity<List<DiffResponse>> compare(
             @RequestBody VersionCompareRequest request) throws VersionNotFoundException {
 
+        auditLogService.logAction(
+                "COMPARE_VERSIONS",
+                "Version",
+                request.oldVersionId(),
+                "Compared version " + request.oldVersionId() + " with " + request.newVersionId()
+        );
+
         return ResponseEntity.ok(diffService.compareVersions(request.oldVersionId(), request.newVersionId()));
     }
 }
