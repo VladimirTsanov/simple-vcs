@@ -17,7 +17,7 @@ if (themeBtn) {
     });
 }
 
-(function() {
+(function () {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-theme');
@@ -126,4 +126,90 @@ function renderDiff(data) {
         row.appendChild(textCell);
         resultsArea.appendChild(row);
     });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const container = document.getElementById("commentsContainer");
+    if (!container) return;
+
+    const docId = container.getAttribute("data-doc-id");
+    const versionId = container.getAttribute("data-version-id");
+
+    // Store globally for submission
+    window.currentDocId = docId;
+    window.currentVersionId = versionId;
+
+    if (docId && docId !== "0" && versionId && versionId !== "0") {
+        loadComments();
+    }
+});
+
+async function loadComments() {
+    try {
+        const response = await fetch(`/api/documents/${window.currentDocId}/versions/${window.currentVersionId}/comment/all`);
+        if (!response.ok) throw new Error("Failed to fetch comments");
+
+        const comments = await response.json();
+        const container = document.getElementById("commentsContainer");
+        container.innerHTML = "";
+
+        if (comments.length === 0) {
+            container.innerHTML = `<p style="opacity: 0.5; font-style: italic;">No discussion yet. Be the first to comment!</p>`;
+            return;
+        }
+
+        comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(comment => {
+            const el = document.createElement("div");
+            el.className = "comment-card fade-in";
+
+            const dateObj = new Date(comment.createdAt);
+            const formattedDate = isNaN(dateObj) ? '' : dateObj.toLocaleString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            const rolesStr = (comment.authorRoles || []).map(r => r.replace(/^ROLE_/i, '')).join(', ');
+
+            el.innerHTML = `
+                <div class="comment-header">
+                    <span class="comment-author">@${comment.authorUsername} (${rolesStr})</span>
+                    <span class="comment-meta" style="opacity: 0.7;">${formattedDate}</span>
+                    <span class="comment-meta" style="opacity: 0.7;">v${comment.versionNum}</span>
+                    <span class="comment-meta" style="opacity: 0.7;">Written at version status: ${comment.versionStatus}</span>
+                </div>
+                <div class="comment-body">${comment.content}</div>
+            `;
+            container.appendChild(el);
+        });
+    } catch (e) {
+        console.error(e);
+        document.getElementById("commentsContainer").innerHTML = `<p style="color: red;">Error loading comments.</p>`;
+    }
+}
+
+async function submitNewComment() {
+    const contentBox = document.getElementById("newCommentContent");
+    const content = contentBox.value.trim();
+    if (!content) return;
+
+    try {
+        const response = await fetch(`/api/documents/${window.currentDocId}/versions/${window.currentVersionId}/comment/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                documentId: window.currentDocId,
+                content: content
+            })
+        });
+
+        if (!response.ok) throw new Error("Failed to submit comment");
+
+        contentBox.value = "";
+        await loadComments();
+    } catch (e) {
+        console.error(e);
+        alert("There was an error posting your comment.");
+    }
 }
