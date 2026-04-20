@@ -25,6 +25,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
+    private final AuditLogService auditLogService;
 
     public Comment postComment(CommentRequest commentRequest, Long authorId) throws UserNotFoundException,
             DocumentNotFoundException {
@@ -37,6 +38,9 @@ public class CommentService {
         Version documentLastVersion = document.getVersions().getFirst();
 
         if (documentLastVersion.getStatus() == VersionStatus.DRAFT) {
+            auditLogService.logActionWithActor(user, "UNAUTHORIZED_COMMENT_ATTEMPT", "Version",
+                    documentLastVersion.getId(),
+                    "Attempted to comment on DRAFT version of document " + document.getId());
             throw new AccessDeniedException("Commenting is completely disabled for DRAFT versions.");
         }
 
@@ -44,6 +48,10 @@ public class CommentService {
             boolean isAllowed = user.getRoles().stream()
                     .anyMatch(role -> role.getName().equals("ROLE_ADMIN") || role.getName().equals("ROLE_REVIEWER"));
             if (!isAllowed) {
+                auditLogService.logActionWithActor(user, "UNAUTHORIZED_COMMENT_ATTEMPT", "Version",
+                        documentLastVersion.getId(),
+                        "Non-reviewer attempted to comment on PENDING_REVIEW version of document "
+                                + document.getId());
                 throw new AccessDeniedException(
                         "Only Reviewers and Admins can comment on a version \"pending review\"");
             }
@@ -54,7 +62,11 @@ public class CommentService {
         newComment.setVersion(documentLastVersion);
         newComment.setContent(commentRequest.content());
 
-        return commentRepository.save(newComment);
+        Comment saved = commentRepository.save(newComment);
+        auditLogService.logActionWithActor(user, "CREATE", "Comment", saved.getId(),
+                "Commented on version " + documentLastVersion.getVersionNumber()
+                        + " of document " + document.getId());
+        return saved;
     }
 
     public List<Comment> getAllCommentsByDocId(Long docId) {
