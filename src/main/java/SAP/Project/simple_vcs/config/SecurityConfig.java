@@ -5,6 +5,7 @@ import SAP.Project.simple_vcs.security.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -55,6 +56,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/admin/***")
                         .hasAuthority("ROLE_ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/documents/*/versions/*/comment/all").authenticated()
+
 
                         .requestMatchers("/new-document", "/versions/**")
                         .hasAnyAuthority("ROLE_AUTHOR", "ROLE_ADMIN")

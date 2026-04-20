@@ -89,7 +89,4 @@ public class WebController {
         return "comparison"; // името на новия HTML файл
     }
 
-
-
-
 }
