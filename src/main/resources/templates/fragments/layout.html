@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:fragment="common_head(title)">
+<head th:fragment="common_head(title, cssFile)">
     <meta charset="UTF-8">
     <title th:text="${title}">ITEAC</title>
-    <link rel="stylesheet" th:href="@{/css/style_index.css}">
+    <link rel="stylesheet" th:href="@{/css/style_layout.css}">
+    <link th:if="${cssFile != null}" rel="stylesheet" th:href="@{/css/} + ${cssFile}">
 </head>
 
 <body>
@@ -111,8 +112,8 @@
             </div>
 
         </div>
-
+    <script th:src="@{/js/javascript_index.js}"></script>
 </footer>
-<script th:src="@{/js/javascript_index.js}"></script>
 </body>
+
 </html>
