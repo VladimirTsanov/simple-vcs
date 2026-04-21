@@ -7,6 +7,28 @@
 
     <header th:replace="~{fragments/layout :: navbar}"></header>
 
+    <style>
+        .role-pill { position: relative; display: block; cursor: pointer; user-select: none; }
+        .role-pill input[type="checkbox"] { position: absolute; opacity: 0; pointer-events: none; }
+        .role-pill span {
+            display: block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            transition: background-color 0.15s ease;
+        }
+        .role-pill:hover span { background-color: rgba(0, 0, 0, 0.06); }
+        .role-pill input[type="checkbox"]:checked + span {
+            background-color: rgba(0, 0, 0, 0.18);
+            font-weight: 600;
+        }
+        .role-pill input[type="checkbox"]:focus-visible + span {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 1px;
+        }
+    </style>
+
     <div class="admin-wrapper" style="padding: 40px 20px; max-width: 1200px; margin: 0 auto;">
         <div class="glass-card" style="padding: 30px; border-radius: 12px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
             <header style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
@@ -44,16 +66,17 @@
                             </td>
 
                             <td style="padding: 12px;">
-                                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post" style="display: flex; gap: 8px; align-items: center;">
-                                    <select name="roleNames" multiple style="border-radius: 4px; padding: 4px; border: 1px solid rgba(0,0,0,0.2); min-height: 60px;">
-                                        <option th:each="r : ${roles}" 
-                                                th:value="${r.name}" 
-                                                th:text="${r.name}" 
-                                                th:selected="${user.roles.contains(r.name)}">
-                                        </option>
-                                    </select>
-                                    <button type="submit" class="cta-btn" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
-                                        Update
+                                <form th:action="@{/admin/users/{id}/roles(id=${user.id})}" method="post" style="display: flex; gap: 12px; align-items: center;">
+                                    <div style="display: flex; flex-direction: column; gap: 4px; min-width: 140px;">
+                                        <label th:each="r : ${roles}" class="role-pill">
+                                            <input type="checkbox" name="roleNames"
+                                                   th:value="${r.name}"
+                                                   th:checked="${user.roles.contains(r.name)}">
+                                            <span th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(r.name, 'ROLE_', '')))}">Admin</span>
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="cta-btn" style="padding: 8px 14px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">
+                                        Save Roles
                                     </button>
                                 </form>
                             </td>
