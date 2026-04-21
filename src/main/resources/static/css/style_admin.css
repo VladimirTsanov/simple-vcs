@@ -1,0 +1,128 @@
+﻿/* === admin_dashboard.html & audit_logs.html styles === */
+
+.dashboard-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-wrapper {
+    width: 100%;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dark-theme .glass-card {
+    background: rgba(22, 27, 34, 0.8) !important;
+    border: 1px solid #30363d;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+:root {
+    --text-color: #333;
+    --primary-color: rgba(46, 125, 50, 0.2);
+}
+
+.dark-theme {
+    --text-color: #cfd0d2;
+    --primary-color: rgba(0, 255, 170, 0.2);
+}
+
+/* Reusing .cta-btn from style_index.css but redefining for standalone use if extracted */
+.cta-btn {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #2e7d32 0%, #81c784 100%);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dark-theme .cta-btn {
+    background: linear-gradient(135deg, #00ffaa 0%, #0088ff 100%);
+    color: #161b22;
+}
+
+.cta-btn:hover {
+    box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
+    transform: translateY(-2px);
+}
+
+.dark-theme .cta-btn:hover {
+    box-shadow: 0 5px 15px rgba(0, 255, 170, 0.4);
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th {
+    background: rgba(0,0,0,0.03);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.dark-theme th {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Inputs and Selects in Admin */
+select, input[type="text"] {
+    background: rgba(255, 255, 255, 0.5);
+    color: #333;
+}
+
+.dark-theme select, .dark-theme input[type="text"] {
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.status-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-draft { background: rgba(158, 158, 158, 0.2); color: #757575; }
+.dark-theme .status-draft { background: rgba(158, 158, 158, 0.3); color: #bdbdbd; }
+
+.status-pending { background: rgba(255, 152, 0, 0.2); color: #f57c00; }
+.dark-theme .status-pending { background: rgba(255, 152, 0, 0.3); color: #ffb74d; }
+
+.status-approved { background: rgba(76, 175, 80, 0.2); color: #388e3c; }
+.dark-theme .status-approved { background: rgba(76, 175, 80, 0.3); color: #81c784; }
+
+.status-rejected { background: rgba(244, 67, 54, 0.2); color: #d32f2f; }
+.dark-theme .status-rejected { background: rgba(244, 67, 54, 0.3); color: #e57373; }
+
+.action-btn.approve {
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    color: #2c3e50;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.dark-theme .action-btn.approve {
+    background: linear-gradient(135deg, #00ffaa 0%, #0088ff 100%);
+    color: white;
+}
+
+.action-btn.approve:hover {
+    transform: translateY(-2px);
+}
