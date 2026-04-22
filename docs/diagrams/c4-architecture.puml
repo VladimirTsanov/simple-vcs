@@ -1,0 +1,34 @@
+@startuml
+!theme C4_brown from https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/themes
+skinparam shadowing false
+skinparam nodesep 140 
+left to right direction
+
+title Container Diagram for Simple Version Control System (C4 Level 2)
+
+actor "Admin" as admin
+actor "User" as user
+
+component [Web Browser] as browser <<Container: Web Application>>
+package "SimpleVcs System" {
+    top to bottom direction
+
+    package "Spring Boot Application" <<(Java, Spring Boot, Thymeleaf)>> {
+        component "Spring Boot WebApp" as webapp <<Spring Boot>>
+
+    }
+
+    node "Data Layer" {
+        database "MySQL Database" as DB
+    }
+}
+
+user -down-> browser : "Uses"
+admin -down-> browser : "Administers"
+
+skinparam nodesep 140 
+browser -right-> webapp: "HTTP Requests \n(HTML, JSON)"
+
+webapp -down-> DB : "Reads/Writes data\n(JDBC)"
+
+@enduml
