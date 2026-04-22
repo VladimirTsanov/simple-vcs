@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:fragment="common_head(title)">
+<head th:fragment="common_head(title, cssFile)">
     <meta charset="UTF-8">
     <title th:text="${title}">ITEAC</title>
-    <link rel="stylesheet" th:href="@{/css/style_index.css}">
+    <link rel="stylesheet" th:href="@{/css/style_layout.css}">
+    <link th:if="${cssFile != null}" rel="stylesheet" th:href="@{/css/} + ${cssFile}">
 </head>
 
 <body>
@@ -13,13 +14,13 @@
         <div class="logo">
             <button id="theme-switcher" class="theme-btn">
                 <div class="light-state-icon">
-                    <img src="images/cat_icon.png" alt="Logo" class="icon" id="icon-default-light">
-                    <img src="images/wolf_icon_happy1.png" alt="" class="icon" id="icon-hover-light">
+                    <img th:src="@{/images/cat_icon.png}" alt="Logo" class="icon" id="icon-default">
+                    <img th:src="@{/images/wolf_icon_happy1.png}" alt="" class="icon" id="icon-hover">
                 </div>
 
                 <div class="dark-state-icon">
-                    <img src="images/wolf_icon_default1.png" alt="Logo" class="icon" id="icon-default-dark">
-                    <img src="images/cat_icon_happy.png" alt="" class="icon" id="icon-hover-dark">
+                    <img th:src="@{/images/wolf_icon_default1.png}" alt="Logo" class="icon" id="icon-default">
+                    <img th:src="@{/images/cat_icon_happy.png}" alt="" class="icon" id="icon-hover">
                 </div>
             </button>
 
@@ -111,8 +112,8 @@
             </div>
 
         </div>
-
+    <script th:src="@{/js/javascript_index.js}"></script>
 </footer>
-<script th:src="@{/js/javascript_index.js}"></script>
 </body>
+
 </html>

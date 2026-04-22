@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:replace="~{fragments/layout :: common_head('ITEAC - Document Details')}"></head>
+<head th:replace="~{fragments/layout :: common_head('ITEAC - Home', 'style_document.css')}"></head>
 
 <body class="light-theme">
 
     <header th:replace="~{fragments/layout :: navbar}"></header>
 
     <div class="file-page-wrapper">
-
         <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
         <div class="glass-card file-details-card">
 
@@ -17,11 +16,12 @@
 
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <a th:if="${document.activeVersion != null and document.activeVersion.status.name() == 'APPROVED'}"
-                        th:href="@{/document/{id}/export/pdf(id=${document.id})}" class="action-btn revert"
-                        style="text-decoration: none;" sec:authorize="hasAnyAuthority('ROLE_AUTHOR', 'ROLE_ADMIN')">
+                       th:href="@{/document/{id}/export/pdf(id=${document.id})}"
+                       class="action-btn revert"
+                       style="text-decoration: none;"
+                       sec:authorize="hasAnyAuthority('ROLE_AUTHOR', 'ROLE_ADMIN')">
                         Export PDF
                     </a>
-
 
                     <form th:action="@{/document/{id}/delete(id=${document.id})}" method="post" style="display:inline;"
                         sec:authorize="hasAnyAuthority('ROLE_ADMIN', 'ROLE_AUTHOR')"
@@ -29,14 +29,14 @@
                         <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
                             <svg class="trash-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 <path d="M10 11v6m4-6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" />
                             </svg>
                         </button>
                     </form>
                 </div>
+
             </header>
 
             <div class="file-info-block">
@@ -44,55 +44,18 @@
                     <div class="file-icon-placeholder">DOC</div>
                 </div>
                 <div class="file-description">
-                    <h3>Current Content</h3>
+                    <h3>Content</h3>
                     <p
                         th:text="${document.activeVersion != null ? document.activeVersion.content : 'No active content available'}">
                         This file contains the updated workspace management proposal for the 2026 Q3 roadmap. It
                         includes budget allocations, team structures, and the final design mockups for the ITEAC
-                        dashboard.
-                    </p>
+                        dashboard.</p>
                 </div>
             </div>
 
             <div class="section-divider"></div>
 
-
-            <div class="comparison-section" sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')"
-                style="margin-bottom: 30px; padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
-                <h3 style="margin-bottom: 15px;">Compare Two Versions</h3>
-                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
-                    <div class="input-group" style="margin-bottom: 0;">
-                        <label>Base Version (Old):</label>
-                        <select id="oldVersionId" class="nav-btn" style="width: 220px; background: white; color: #333;">
-                            <option value="" disabled selected>Select version</option>
-                            <option th:each="v : ${document.versions}" th:value="${v.id}"
-                                th:text="'v' + ${v.versionNumber} + ' (' + ${v.status} + ')'"></option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="margin-bottom: 0;">
-                        <label>Compare With (New):</label>
-                        <select id="newVersionId" class="nav-btn" style="width: 220px; background: white; color: #333;">
-                            <option value="" disabled selected>Select version</option>
-                            <option th:each="v : ${document.versions}" th:value="${v.id}"
-                                th:text="'v' + ${v.versionNumber} + ' (' + ${v.status} + ')'"></option>
-                        </select>
-                    </div>
-                    <button onclick="compareSelectedVersions()" class="cta-btn" style="height: 42px;">Compare
-                        Now</button>
-                </div>
-
-
-                <div id="diff-container" class="hidden">
-                    <div class="diff-header">Visual Diff Results:</div>
-                    <div id="diff-results"></div>
-                </div>
-            </div>
-
-            <div class="section-divider"></div>
-
-
-            <div class="file-versions-block"
-                sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
+            <div class="file-versions-block">
                 <h3>Version History</h3>
                 <table class="version-table">
                     <thead>
@@ -106,8 +69,9 @@
                     </thead>
                     <tbody>
                         <tr th:each="version : ${document.versions}">
-                            <td th:text="'v' + ${version.versionNumber}">v1</td>
-                            <td th:text="${#temporals.format(version.createdAt, 'dd/MM/yyyy HH:mm')}">Date</td>
+                            <td th:text="'v' + ${version.versionNumber}">v2.1</td>
+                            <td th:text="${#temporals.format(version.createdAt, 'MMM dd, yyyy HH:mm')}">Oct 24, 2026
+                            </td>
                             <td>
                                 <span th:class="'status-tag '
                                     + (${version.status.name() == 'DRAFT'} ? 'status-draft' : '')
@@ -118,36 +82,39 @@
                             </td>
                             <td th:text="${version.author != null ? version.author.username : 'Unknown'}">Author</td>
                             <td>
-
+                                <!-- Submit for Review: author, reviewer or admin, only on DRAFT -->
                                 <form th:if="${version.status.name() == 'DRAFT'}"
-                                    th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
-                                    method="post" style="display:inline;"
-                                    sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
-                                    <input type="hidden" name="newStatus" value="PENDING_REVIEW" />
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="PENDING_REVIEW"/>
                                     <button type="submit" class="action-btn submit-review">Submit for Review</button>
                                 </form>
 
+                                <!-- Approve: reviewer or admin, only on PENDING_REVIEW -->
                                 <form th:if="${version.status.name() == 'PENDING_REVIEW'}"
-                                    th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
-                                    method="post" style="display:inline;"
-                                    sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
-                                    <input type="hidden" name="newStatus" value="APPROVED" />
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="APPROVED"/>
                                     <button type="submit" class="action-btn approve">Approve</button>
                                 </form>
 
+                                <!-- Reject: reviewer or admin, only on PENDING_REVIEW -->
                                 <form th:if="${version.status.name() == 'PENDING_REVIEW'}"
-                                    th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
-                                    method="post" style="display:inline;"
-                                    sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
-                                    <input type="hidden" name="newStatus" value="REJECTED" />
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="REJECTED"/>
                                     <button type="submit" class="action-btn delete">Reject</button>
                                 </form>
 
+                                <!-- Revert to Draft: reviewer or admin, only on REJECTED -->
                                 <form th:if="${version.status.name() == 'REJECTED'}"
-                                    th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
-                                    method="post" style="display:inline;"
-                                    sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
-                                    <input type="hidden" name="newStatus" value="DRAFT" />
+                                      th:action="@{/document/{docId}/version/{vId}/status(docId=${document.id},vId=${version.id})}"
+                                      method="post" style="display:inline;"
+                                      sec:authorize="hasAnyAuthority('ROLE_REVIEWER','ROLE_ADMIN')">
+                                    <input type="hidden" name="newStatus" value="DRAFT"/>
                                     <button type="submit" class="action-btn revert">Revert to Draft</button>
                                 </form>
                             </td>
@@ -156,58 +123,34 @@
                 </table>
             </div>
 
-            <div class="comments-section-wrapper">
-                <h3 style="margin-bottom: 20px;">Discussion</h3>
-
-                <div class="comments-block">
-                    <div id="commentsContainer" th:data-doc-id="${document.id}"
-                        th:data-version-id="${document.activeVersion != null ? document.activeVersion.id : 0}">
-                    </div>
-                </div>
-
-                <div class="comment-form-block" th:if="${not #lists.isEmpty(document.versions) and 
-                        document.versions[0].status.name() != 'DRAFT' and 
-                        (document.versions[0].status.name() != 'PENDING_REVIEW' or 
-                        #authorization.expression('hasAnyAuthority(''ROLE_ADMIN'', ''ROLE_REVIEWER'')'))}"
-                    sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
-                    <textarea id="newCommentContent" class="comment-textarea"
-                        placeholder="Add your thoughts..."></textarea>
-                    <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
-                        <button type="button" class="action-btn approve" onclick="submitNewComment()">Post
-                            Comment</button>
-                    </div>
-                </div>
+            <!-- New Version Button -->
+            <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')" style="margin-top: 20px;">
+                <button class="action-btn approve" onclick="openNewVersionModal()">+ New Version</button>
             </div>
 
-
-            <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')"
-                style="margin-top: 30px; display: flex; gap: 10px;">
-                <button class="action-btn approve" onclick="openNewVersionModal()">+ New Version</button>
+            <!-- Share Section -->
+            <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')" style="margin-top: 12px;">
                 <button class="action-btn submit-review" onclick="openShareModal()">Share Document</button>
-                <div th:if="${document.sharedWith != null and !document.sharedWith.empty}"
-                    style="margin-top: 10px; font-size: 0.88rem; color: #555;">
+                <div th:if="${document.sharedWith != null and !document.sharedWith.empty}" style="margin-top: 10px; font-size: 0.88rem; color: #555;">
                     Shared with:
                     <span th:each="u, iter : ${document.sharedWith}">
                         <strong th:text="${u.username}"></strong><span th:if="${!iter.last}">, </span>
                     </span>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <div id="shareModal"
-        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div
-            style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:440px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
-            <button onclick="closeShareModal()"
-                style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
+    <!-- Share Modal -->
+    <div id="shareModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:440px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
+            <button onclick="closeShareModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
             <h2 style="margin:0 0 8px; font-size:1.4rem;">Share Document</h2>
-            <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Enter the username or email of the user to share
-                with.</p>
+            <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Enter the username or email of the user to share with.</p>
             <form th:action="@{/document/{id}/share(id=${document.id})}" method="post">
                 <input type="text" name="emailOrUsername" placeholder="Username or email"
-                    style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; box-sizing:border-box;"
-                    required />
+                       style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; box-sizing:border-box;" required/>
                 <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                     <button type="button" onclick="closeShareModal()" class="action-btn revert">Cancel</button>
                     <button type="submit" class="action-btn approve">Share</button>
@@ -216,19 +159,16 @@
         </div>
     </div>
 
-    <div id="newVersionModal"
-        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
-        <div
-            style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:680px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
-            <button onclick="closeNewVersionModal()"
-                style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
+    <!-- New Version Modal -->
+    <div id="newVersionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:32px; width:90%; max-width:680px; box-shadow:0 16px 48px rgba(0,0,0,0.2); position:relative;">
+            <button onclick="closeNewVersionModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:1.4rem; cursor:pointer; color:#666; line-height:1;">&times;</button>
             <h2 style="margin:0 0 8px; font-size:1.4rem;">New Version</h2>
-            <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Edit the content below — it starts from the
-                current active version.</p>
+            <p style="margin:0 0 16px; color:#666; font-size:0.9rem;">Edit the content below — it starts from the current active version.</p>
             <form th:action="@{/document/{id}/version/new(id=${document.id})}" method="post">
                 <textarea name="content" rows="12"
-                    th:text="${document.activeVersion != null ? document.activeVersion.content : ''}"
-                    style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
+                          th:text="${document.activeVersion != null ? document.activeVersion.content : ''}"
+                          style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
                 <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                     <button type="button" onclick="closeNewVersionModal()" class="action-btn revert">Cancel</button>
                     <button type="submit" class="action-btn approve">Create Version</button>
@@ -237,21 +177,58 @@
         </div>
     </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
-    <script th:src="@{/js/javascript_index.js}"></script>
-    <script>
-        function openShareModal() { document.getElementById('shareModal').style.display = 'flex'; }
-        function closeShareModal() { document.getElementById('shareModal').style.display = 'none'; }
-        function openNewVersionModal() { document.getElementById('newVersionModal').style.display = 'flex'; }
-        function closeNewVersionModal() { document.getElementById('newVersionModal').style.display = 'none'; }
 
-        window.onclick = function (event) {
-            if (event.target.className === 'modal-backdrop') {
-                event.target.style.display = 'none';
-            }
-        }
-    </script>
 </body>
+
+<script src="js/javascript_index.js"></script>
+<script>
+    function openShareModal() {
+        document.getElementById('shareModal').style.display = 'flex';
+    }
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = 'none';
+    }
+    document.getElementById('shareModal').addEventListener('click', function(e) {
+        if (e.target === this) closeShareModal();
+    });
+
+    function openNewVersionModal() {
+        const modal = document.getElementById('newVersionModal');
+        modal.style.display = 'flex';
+    }
+    function closeNewVersionModal() {
+        document.getElementById('newVersionModal').style.display = 'none';
+    }
+    document.getElementById('newVersionModal').addEventListener('click', function(e) {
+        if (e.target === this) closeNewVersionModal();
+    });
+</script>
 
 </html>
