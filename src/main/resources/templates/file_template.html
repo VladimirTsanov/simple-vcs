@@ -120,7 +120,7 @@
                                       method="post" style="display:inline;"
                                       sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
                                     <input type="hidden" name="newStatus" value="PENDING_REVIEW"/>
-                                    <button type="submit" class="action-btn submit-review">Submit for Review</button>
+                                    <button type="submit" class="action-btn primary">Submit for Review</button>
                                 </form>
 
                                 <!-- Approve: reviewer or admin, only on PENDING_REVIEW -->
@@ -172,19 +172,19 @@
                     <textarea id="newCommentContent" class="comment-textarea"
                         placeholder="Add your thoughts..."></textarea>
                     <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
-                        <button type="button" class="action-btn approve" onclick="submitNewComment()">Post Comment</button>
+                        <button type="button" class="action-btn primary" onclick="submitNewComment()">Post Comment</button>
                     </div>
                 </div>
             </div>
 
             <!-- New Version Button -->
             <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')" style="margin-top: 20px;">
-                <button class="action-btn approve" onclick="openNewVersionModal()">+ New Version</button>
+                <button class="action-btn primary" onclick="openNewVersionModal()">+ New Version</button>
             </div>
 
             <!-- Share Section -->
             <div sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')" style="margin-top: 12px;">
-                <button class="action-btn submit-review" onclick="openShareModal()">Share Document</button>
+                <button class="action-btn primary" onclick="openShareModal()">Share Document</button>
                 <div th:if="${document.sharedWith != null and !document.sharedWith.empty}" style="margin-top: 10px; font-size: 0.88rem; color: #555;">
                     Shared with:
                     <span th:each="u, iter : ${document.sharedWith}">
@@ -207,7 +207,7 @@
                        style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; box-sizing:border-box;" required/>
                 <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                     <button type="button" onclick="closeShareModal()" class="action-btn revert">Cancel</button>
-                    <button type="submit" class="action-btn approve">Share</button>
+                    <button type="submit" class="action-btn primary">Share</button>
                 </div>
             </form>
         </div>
@@ -225,7 +225,7 @@
                           style="width:100%; padding:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.2); font-size:0.95rem; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
                 <div style="display:flex; gap:10px; margin-top:16px; justify-content:flex-end;">
                     <button type="button" onclick="closeNewVersionModal()" class="action-btn revert">Cancel</button>
-                    <button type="submit" class="action-btn approve">Create Version</button>
+                    <button type="submit" class="action-btn primary">Create Version</button>
                 </div>
             </form>
         </div>
