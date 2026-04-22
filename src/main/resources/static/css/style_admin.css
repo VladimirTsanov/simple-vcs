@@ -38,7 +38,7 @@
     padding: 10px 20px;
     border-radius: 50px;
     border: none;
-    background: linear-gradient(135deg, #2e7d32 0%, #81c784 100%);
+    background: #2e7d32;
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -46,16 +46,18 @@
 }
 
 .dark-theme .cta-btn {
-    background: linear-gradient(135deg, #00ffaa 0%, #0088ff 100%);
+    background: #00cc88;
     color: #161b22;
 }
 
 .cta-btn:hover {
+    background: #1b5e20;
     box-shadow: 0 5px 15px rgba(46, 125, 50, 0.4);
     transform: translateY(-2px);
 }
 
 .dark-theme .cta-btn:hover {
+    background: #00a872;
     box-shadow: 0 5px 15px rgba(0, 255, 170, 0.4);
 }
 
@@ -107,22 +109,52 @@ select, input[type="text"] {
 .status-rejected { background: rgba(244, 67, 54, 0.2); color: #d32f2f; }
 .dark-theme .status-rejected { background: rgba(244, 67, 54, 0.3); color: #e57373; }
 
+.action-btn.primary,
 .action-btn.approve {
     padding: 8px 16px;
     border-radius: 50px;
-    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-    color: #2c3e50;
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
 }
 
-.dark-theme .action-btn.approve {
-    background: linear-gradient(135deg, #00ffaa 0%, #0088ff 100%);
+.action-btn.primary {
+    background: #2e7d32;
     color: white;
 }
 
-.action-btn.approve:hover {
+.dark-theme .action-btn.primary {
+    background: #00cc88;
+    color: #161b22;
+}
+
+.action-btn.primary:hover {
+    background: #1b5e20;
     transform: translateY(-2px);
+}
+
+.dark-theme .action-btn.primary:hover {
+    background: #00a872;
+}
+
+.action-btn.approve {
+    background: #1b5e20;
+    color: white;
+    box-shadow: 0 2px 8px rgba(27, 94, 32, 0.3);
+}
+
+.dark-theme .action-btn.approve {
+    background: #00ffaa;
+    color: #161b22;
+    box-shadow: 0 0 12px rgba(0, 255, 170, 0.35);
+}
+
+.action-btn.approve:hover {
+    background: #0f3e13;
+    transform: translateY(-2px);
+}
+
+.dark-theme .action-btn.approve:hover {
+    background: #00e699;
 }
