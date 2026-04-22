@@ -55,7 +55,39 @@
 
             <div class="section-divider"></div>
 
-            <div class="file-versions-block">
+            <div class="comparison-section" sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')"
+                style="margin-bottom: 30px; padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="margin-bottom: 15px;">Compare Two Versions</h3>
+                <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>Base Version (Old):</label>
+                        <select id="oldVersionId" class="nav-btn" style="width: 220px; background: white; color: #333;">
+                            <option value="" disabled selected>Select version</option>
+                            <option th:each="v : ${document.versions}" th:value="${v.id}"
+                                th:text="'v' + ${v.versionNumber} + ' (' + ${v.status} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label>Compare With (New):</label>
+                        <select id="newVersionId" class="nav-btn" style="width: 220px; background: white; color: #333;">
+                            <option value="" disabled selected>Select version</option>
+                            <option th:each="v : ${document.versions}" th:value="${v.id}"
+                                th:text="'v' + ${v.versionNumber} + ' (' + ${v.status} + ')'"></option>
+                        </select>
+                    </div>
+                    <button onclick="compareSelectedVersions()" class="cta-btn" style="height: 42px;">Compare Now</button>
+                </div>
+
+                <div id="diff-container" class="hidden">
+                    <div class="diff-header">Visual Diff Results:</div>
+                    <div id="diff-results"></div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="file-versions-block"
+                sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
                 <h3>Version History</h3>
                 <table class="version-table">
                     <thead>
@@ -121,6 +153,28 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="comments-section-wrapper">
+                <h3 style="margin-bottom: 20px;">Discussion</h3>
+
+                <div class="comments-block">
+                    <div id="commentsContainer" th:data-doc-id="${document.id}"
+                        th:data-version-id="${document.activeVersion != null ? document.activeVersion.id : 0}">
+                    </div>
+                </div>
+
+                <div class="comment-form-block" th:if="${not #lists.isEmpty(document.versions) and
+                        document.versions[0].status.name() != 'DRAFT' and
+                        (document.versions[0].status.name() != 'PENDING_REVIEW' or
+                        #authorization.expression('hasAnyAuthority(''ROLE_ADMIN'', ''ROLE_REVIEWER'')'))}"
+                    sec:authorize="hasAnyAuthority('ROLE_AUTHOR','ROLE_REVIEWER','ROLE_ADMIN')">
+                    <textarea id="newCommentContent" class="comment-textarea"
+                        placeholder="Add your thoughts..."></textarea>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 5px;">
+                        <button type="button" class="action-btn approve" onclick="submitNewComment()">Post Comment</button>
+                    </div>
+                </div>
             </div>
 
             <!-- New Version Button -->
