@@ -26,7 +26,11 @@
         const v1 = urlParams.get('v1');
         const v2 = urlParams.get('v2');
 
-        const response = await fetch(`/api/versions/compare/${v1}/${v2}`);
+        const response = await fetch('/versions/compare', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oldVersionId: v1, newVersionId: v2 })
+        });
         const data = await response.json();
 
         const container = document.getElementById('diff-content');
