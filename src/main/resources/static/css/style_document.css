@@ -447,6 +447,50 @@
     background-color: white;
 }
 
+.dark-theme .diff-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .diff-num {
+    background-color: #161b22;
+    color: rgba(230, 237, 243, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dark-theme .diff-text {
+    color: #e6edf3;
+}
+
+.dark-theme .row-equal {
+    background-color: #0d1117;
+}
+
+.dark-theme .row-insert {
+    background-color: rgba(46, 160, 67, 0.18);
+}
+
+.dark-theme .row-insert .diff-num {
+    background-color: rgba(46, 160, 67, 0.3);
+    color: #7ee787;
+}
+
+.dark-theme .row-insert .diff-text {
+    color: #aff5b4;
+}
+
+.dark-theme .row-delete {
+    background-color: rgba(248, 81, 73, 0.18);
+}
+
+.dark-theme .row-delete .diff-num {
+    background-color: rgba(248, 81, 73, 0.3);
+    color: #ffa198;
+}
+
+.dark-theme .row-delete .diff-text {
+    color: #ffdcd7;
+}
+
 /* === comments / discussion === */
 
 .comments-section-wrapper {
