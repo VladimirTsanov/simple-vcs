@@ -213,3 +213,64 @@ async function submitNewComment() {
         alert("There was an error posting your comment.");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleChat() {
+            const window = document.getElementById('chat-window');
+            window.style.display = window.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Send message on 'Enter' key
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userPrompt');
+            const box = document.getElementById('chat-box');
+            const msg = input.value.trim();
+
+            if (!msg) return;
+
+            // Add user message to UI
+            box.innerHTML += `<div class="msg user">${msg}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg})
+                });
+                const data = await response.json();
+
+                // Add AI response to UI
+                box.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+                box.scrollTop = box.scrollHeight;
+            } catch (error) {
+                box.innerHTML += `<div class="msg bot" style="color:red">Error connecting to server.</div>`;
+            }
+        }

@@ -48,6 +48,34 @@
 
 
 
+<main th:fragment="assistant" class="assistant">
+
+    <button id="chat-button" onclick="toggleChat()">💬</button>
+
+    <div id="chat-window">
+        <div class="chat-header">
+            <span>Assistant</span>
+            <span style="cursor:pointer" onclick="toggleChat()">×</span>
+        </div>
+        <div id="chat-box">
+            <div class="msg bot">Hi! How can I help you with ITEAC today?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userPrompt" placeholder="Type a message..." onkeypress="handleKey(event)">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+</main>
+
+
+
+
+
+
+
+
+
 <footer th:fragment="footer" class="footer" id="myfooter">
         <div class="footer-container">
 

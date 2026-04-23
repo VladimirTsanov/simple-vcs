@@ -6,6 +6,8 @@
 
 <header th:replace="~{fragments/layout :: navbar}"></header>
 
+<main th:replace="~{fragments/layout :: assistant}"></main>
+
 
 <h3 sec:authorize="isAuthenticated()">Welcome back, <span sec:authentication="principal.username">User</span>!</h3>
 <section class="about" sec:authorize="isAnonymous()">
