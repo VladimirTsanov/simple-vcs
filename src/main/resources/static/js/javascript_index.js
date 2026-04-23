@@ -4,27 +4,16 @@ function toggleTheme(event) {
 }
 
 const themeBtn = document.getElementById('theme-switcher');
-const body = document.body;
+const root = document.documentElement;
 
 if (themeBtn) {
     themeBtn.addEventListener('click', () => {
-        body.classList.toggle('dark-theme');
-        if (body.classList.contains('dark-theme')) {
-            localStorage.setItem('theme', 'dark');
-        } else {
-            localStorage.setItem('theme', 'light');
-        }
+        const nowDark = !root.classList.contains('dark-theme');
+        root.classList.toggle('dark-theme', nowDark);
+        root.classList.toggle('light-theme', !nowDark);
+        localStorage.setItem('theme', nowDark ? 'dark' : 'light');
     });
 }
-
-(function () {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-    } else {
-        document.body.classList.remove('dark-theme');
-    }
-})();
 
 function toggleForms() {
     const login = document.getElementById('login-side');

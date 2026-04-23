@@ -10,29 +10,6 @@
     width: 100%;
 }
 
-.glass-card {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
-}
-
-.dark-theme .glass-card {
-    background: rgba(22, 27, 34, 0.8) !important;
-    border: 1px solid #30363d;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
-}
-
-:root {
-    --text-color: #333;
-    --primary-color: rgba(46, 125, 50, 0.2);
-}
-
-.dark-theme {
-    --text-color: #cfd0d2;
-    --primary-color: rgba(0, 255, 170, 0.2);
-}
-
 /* Reusing .cta-btn from style_index.css but redefining for standalone use if extracted */
 .cta-btn {
     padding: 10px 20px;
@@ -87,6 +64,23 @@ select, input[type="text"] {
     background: rgba(0, 0, 0, 0.2);
     color: #fff;
     border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark-theme select option {
+    background: #1f242d;
+    color: #e6edf3;
+}
+
+.dark-theme #detailsModal {
+    border: 1px solid #30363d;
+}
+
+#detailsModal::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.dark-theme #detailsModal::backdrop {
+    background: rgba(0, 0, 0, 0.65);
 }
 
 .status-tag {

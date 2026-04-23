@@ -156,6 +156,56 @@
     font-size: 14px;
     border: 1px solid transparent;
     outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .light-theme .input-group input {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1c1c1c;
+    border-color: rgba(46, 125, 50, 0.25);
+  }
+
+  .light-theme .input-group input::placeholder {
+    color: rgba(0, 0, 0, 0.35);
+  }
+
+  .light-theme .input-group input:focus {
+    background: #ffffff;
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+  }
+
+  .dark-theme .input-group input {
+    background: rgba(0, 0, 0, 0.3);
+    color: #e6edf3;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .dark-theme .input-group input::placeholder {
+    color: rgba(230, 237, 243, 0.4);
+  }
+
+  .dark-theme .input-group input:focus {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: #00ffaa;
+    box-shadow: 0 0 0 3px rgba(0, 255, 170, 0.2);
+  }
+
+  /* Browser autofill override — Chrome/Safari force a blue/yellow bg by default */
+  .light-theme .input-group input:-webkit-autofill,
+  .light-theme .input-group input:-webkit-autofill:hover,
+  .light-theme .input-group input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.95) inset;
+    -webkit-text-fill-color: #1c1c1c;
+    caret-color: #1c1c1c;
+  }
+
+  .dark-theme .input-group input:-webkit-autofill,
+  .dark-theme .input-group input:-webkit-autofill:hover,
+  .dark-theme .input-group input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 30px #1f242d inset;
+    -webkit-text-fill-color: #e6edf3;
+    caret-color: #e6edf3;
   }
 
   .login-submit {
@@ -168,6 +218,31 @@
     cursor: pointer;
     margin-top: 10px;
     border: none;
+    transition: all 0.3s ease;
+  }
+
+  .light-theme .login-submit {
+    background: #2e7d32;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+  }
+
+  .light-theme .login-submit:hover {
+    background: #1b5e20;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
+  }
+
+  .dark-theme .login-submit {
+    background: #00cc88;
+    color: #0d1117;
+    box-shadow: 0 4px 12px rgba(0, 255, 170, 0.2);
+  }
+
+  .dark-theme .login-submit:hover {
+    background: #00a872;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 255, 170, 0.4);
   }
 
 
@@ -222,12 +297,4 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateX(-15px); }
   to { opacity: 1; transform: translateX(0); }
-}
-.login-submit {
-  width: 100%;
-  padding: 14px;
-  border-radius: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
 }
