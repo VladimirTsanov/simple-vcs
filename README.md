@@ -33,7 +33,7 @@ This project uses Docker to quickly provision a local MySQL database.
 
 1. **Clone the repository** (if you haven't already):
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/VladimirTsanov/simple-vcs
    cd simple-vcs
    ```
 
