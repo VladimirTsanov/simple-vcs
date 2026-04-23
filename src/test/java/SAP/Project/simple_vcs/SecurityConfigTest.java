@@ -19,27 +19,29 @@ public class SecurityConfigTest {
 
     @Test
     public void accessPublic_ShouldBeOk() throws Exception {
-        mockMvc.perform(get("/api/public"))
+        // /login is explicitly permitted for all in the security config
+        mockMvc.perform(get("/login"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void accessAdmin_WithoutAuth_ShouldBeUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/admin"))
-                .andExpect(status().isUnauthorized());
+    public void accessAdmin_WithoutAuth_ShouldRedirectToLogin() throws Exception {
+        // Form-based login: unauthenticated requests are redirected (302), not 401
+        mockMvc.perform(get("/admin/users"))
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void accessAdmin_WithUserRole_ShouldBeForbidden() throws Exception {
-        mockMvc.perform(get("/api/admin"))
+        mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void accessAdmin_WithAdminRole_ShouldBeOk() throws Exception {
-        mockMvc.perform(get("/api/admin"))
+        mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isOk());
     }
 }
