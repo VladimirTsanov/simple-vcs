@@ -5,6 +5,31 @@
     font-family: 'Inter', sans-serif;
 }
 
+:root {
+    --text-color: #333;
+    --primary-color: rgba(46, 125, 50, 0.2);
+    --bg-color: #ffffff;
+}
+
+.dark-theme {
+    --text-color: #cfd0d2;
+    --primary-color: rgba(0, 255, 170, 0.2);
+    --bg-color: #161b22;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dark-theme .glass-card {
+    background: rgba(22, 27, 34, 0.8) !important;
+    border: 1px solid #30363d;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
 /* Responsive Typography */
 h1 {
     font-size: clamp(1rem, 2.5vw, 2.75rem);
@@ -134,10 +159,10 @@ p {
 
 
   .dark-theme .nav-btn:hover {
-    background: linear-gradient(to right, #1f242d, #00ffaa);
-    color: #033e2b;
-    border: 1px solid #00ffaa; /* Subtle blue border */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: linear-gradient(to right, rgba(0, 255, 170, 0.08), rgba(0, 255, 170, 0.3));
+    color: #00ffaa;
+    border: 1px solid #00ffaa;
+    box-shadow: 0 2px 8px rgba(0, 255, 170, 0.2);
   }
 
   .menu-toggle {
@@ -193,11 +218,11 @@ p {
 
 
 
-  body.dark-theme .light-state-icon {
+  .dark-theme .light-state-icon {
     display: none;
   }
 
-  body.dark-theme .dark-state-icon {
+  .dark-theme .dark-state-icon {
     display: block;
   }
 

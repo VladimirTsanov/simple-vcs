@@ -282,6 +282,75 @@
 
 /* === version comparison diff === */
 
+.comparison-section {
+    margin-bottom: 30px;
+    padding: 24px;
+    border-radius: 15px;
+}
+
+.comparison-section h3 {
+    margin: 0 0 18px 0;
+    color: var(--text-color);
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.compare-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.comparison-section .input-group {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.comparison-section .input-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.version-select {
+    width: 220px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.7);
+    color: #333;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.version-select:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+}
+
+.dark-theme .version-select {
+    background: rgba(0, 0, 0, 0.25);
+    color: #e6edf3;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark-theme .version-select:focus {
+    border-color: #00ffaa;
+    box-shadow: 0 0 0 3px rgba(0, 255, 170, 0.2);
+}
+
+.dark-theme .version-select option {
+    background: #1f242d;
+    color: #e6edf3;
+}
+
 .compare-btn {
     padding: 0 24px;
     height: 42px;
@@ -376,6 +445,50 @@
 
 .row-equal {
     background-color: white;
+}
+
+.dark-theme .diff-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark-theme .diff-num {
+    background-color: #161b22;
+    color: rgba(230, 237, 243, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dark-theme .diff-text {
+    color: #e6edf3;
+}
+
+.dark-theme .row-equal {
+    background-color: #0d1117;
+}
+
+.dark-theme .row-insert {
+    background-color: rgba(46, 160, 67, 0.18);
+}
+
+.dark-theme .row-insert .diff-num {
+    background-color: rgba(46, 160, 67, 0.3);
+    color: #7ee787;
+}
+
+.dark-theme .row-insert .diff-text {
+    color: #aff5b4;
+}
+
+.dark-theme .row-delete {
+    background-color: rgba(248, 81, 73, 0.18);
+}
+
+.dark-theme .row-delete .diff-num {
+    background-color: rgba(248, 81, 73, 0.3);
+    color: #ffa198;
+}
+
+.dark-theme .row-delete .diff-text {
+    color: #ffdcd7;
 }
 
 /* === comments / discussion === */

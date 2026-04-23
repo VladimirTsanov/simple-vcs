@@ -4,6 +4,16 @@
 <head th:fragment="common_head(title, cssFile)">
     <meta charset="UTF-8">
     <title th:text="${title}">ITEAC</title>
+    <script th:inline="none">
+        (function () {
+            try {
+                var saved = localStorage.getItem('theme');
+                document.documentElement.classList.add(saved === 'dark' ? 'dark-theme' : 'light-theme');
+            } catch (e) {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
     <link rel="stylesheet" th:href="@{/css/style_layout.css}">
     <link th:if="${cssFile != null}" rel="stylesheet" th:href="@{/css/} + ${cssFile}">
 </head>

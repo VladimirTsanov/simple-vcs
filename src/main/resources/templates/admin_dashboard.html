@@ -3,7 +3,7 @@
 
 <head th:replace="~{fragments/layout :: common_head('ITEAC - Admin Dashboard', 'style_admin.css')}"></head>
 
-<body class="light-theme dashboard-body">
+<body class="dashboard-body">
 
     <header th:replace="~{fragments/layout :: navbar}"></header>
 
@@ -26,6 +26,12 @@
         .role-pill input[type="checkbox"]:focus-visible + span {
             outline: 2px solid var(--primary-color);
             outline-offset: 1px;
+        }
+        .dark-theme .role-pill:hover span { background-color: rgba(255, 255, 255, 0.08); }
+        .dark-theme .role-pill input[type="checkbox"]:checked + span {
+            background-color: rgba(0, 255, 170, 0.2);
+            color: #00ffaa;
+            font-weight: 600;
         }
     </style>
 
