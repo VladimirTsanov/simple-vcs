@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "versions")
@@ -46,4 +47,7 @@ public class Version {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "version", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments;
 }
