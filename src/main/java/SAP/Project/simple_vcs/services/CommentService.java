@@ -62,6 +62,8 @@ public class CommentService {
         newComment.setVersion(documentLastVersion);
         newComment.setContent(commentRequest.content());
 
+        documentLastVersion.getComments().add(newComment);
+
         Comment saved = commentRepository.save(newComment);
         auditLogService.logActionWithActor(user, "CREATE", "Comment", saved.getId(),
                 "Commented on version " + documentLastVersion.getVersionNumber()
